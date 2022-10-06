@@ -6,51 +6,51 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES # Files
-			src/utils/files/files.cpp
+			src/cpputils/files/files.cpp
 			
 			# Logger
-			src/utils/logger/logger.cpp
+			src/cpputils/logger/logger.cpp
 			
 			# Exceptions
-			src/utils/exceptions/exception.cpp
-			src/utils/exceptions/runtimeexception/runtimeexception.cpp
+			src/cpputils/exceptions/exception.cpp
+			src/cpputils/exceptions/runtimeexception/runtimeexception.cpp
 			
 			# Encryptors
-			src/utils/encryptors/encryptors.cpp
-			src/utils/encryptors/abstract/abstractencryptor.cpp
-			src/utils/encryptors/aes256encryptor/aes256encryptor.cpp
-			src/utils/encryptors/aes256encryptor/aes.cpp
+			src/cpputils/encryptors/encryptors.cpp
+			src/cpputils/encryptors/abstract/abstractencryptor.cpp
+			src/cpputils/encryptors/aes256encryptor/aes256encryptor.cpp
+			src/cpputils/encryptors/aes256encryptor/aes.cpp
 			
 			# Synchronizers
-			src/utils/synchronizers/synchronizers.cpp
-			src/utils/synchronizers/countdownlatch/countdownlatch.cpp
+			src/cpputils/synchronizers/synchronizers.cpp
+			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp
 )
 
 set(HEADERS # Files
-			src/utils/files/files.h
+			src/cpputils/files/files.h
 
 			# Logger
-			src/utils/logger/logger.h
+			src/cpputils/logger/logger.h
 			
 			# Exceptions
-			src/utils/exceptions/exception.h
-			src/utils/exceptions/exceptions.h
-			src/utils/exceptions/exceptiontype.h
-			src/utils/exceptions/runtimeexception/runtimeexception.h
+			src/cpputils/exceptions/exception.h
+			src/cpputils/exceptions/exceptions.h
+			src/cpputils/exceptions/exceptiontype.h
+			src/cpputils/exceptions/runtimeexception/runtimeexception.h
 			
 			# Encryptors
-			src/utils/encryptors/iencryptor.h
-			src/utils/encryptors/encryptors.h
-			src/utils/encryptors/abstract/abstractencryptor.h
-			src/utils/encryptors/aes256encryptor/aes256encryptor.h
-			src/utils/encryptors/aes256encryptor/aes.h
+			src/cpputils/encryptors/iencryptor.h
+			src/cpputils/encryptors/encryptors.h
+			src/cpputils/encryptors/abstract/abstractencryptor.h
+			src/cpputils/encryptors/aes256encryptor/aes256encryptor.h
+			src/cpputils/encryptors/aes256encryptor/aes.h
 			
 			# Synchronizers
-			src/utils/synchronizers/synchronizers.h
-			src/utils/synchronizers/countdownlatch/countdownlatch.h
+			src/cpputils/synchronizers/synchronizers.h
+			src/cpputils/synchronizers/countdownlatch/countdownlatch.h
 			
 			# ThreadPool
-			src/utils/threadpool/threadpool.h
+			src/cpputils/threadpool/threadpool.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
