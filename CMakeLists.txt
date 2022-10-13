@@ -33,7 +33,7 @@ set(HEADERS # Files
 			src/cpputils/logger/logger.h
 
 			# Serialization
-			src/cpputils/serialization/iserializable.h
+			src/cpputils/serialization/serializable.h
 			
 			# Exceptions
 			src/cpputils/exceptions/exception.h
@@ -42,7 +42,7 @@ set(HEADERS # Files
 			src/cpputils/exceptions/runtimeexception/runtimeexception.h
 			
 			# Encryptors
-			src/cpputils/encryptors/iencryptor.h
+			src/cpputils/encryptors/encryptor.h
 			src/cpputils/encryptors/encryptors.h
 			src/cpputils/encryptors/abstract/abstractencryptor.h
 			src/cpputils/encryptors/aes256encryptor/aes256encryptor.h

@@ -14,7 +14,7 @@ class Exception {
 #else
       std::string
 #endif
-      GetDescription() const noexcept = 0;
+      GetDescription() const noexcept;
 
   virtual ~Exception() {}
 

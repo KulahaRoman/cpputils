@@ -1,3 +1,3 @@
 #pragma once
 
-enum class ExceptionType { Runtime };
+enum class ExceptionType { None, Runtime };

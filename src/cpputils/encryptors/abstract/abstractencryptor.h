@@ -1,8 +1,8 @@
 #pragma once
 #include "../../exceptions/exceptions.h"
-#include "../iencryptor.h"
+#include "../encryptor.h"
 
-class AbstractEncryptor : public IEncryptor {
+class AbstractEncryptor : public Encryptor {
  public:
   AbstractEncryptor(uint64_t blockSize, uint64_t keySize, ByteArray key);
 
