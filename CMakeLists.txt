@@ -31,9 +31,6 @@ set(HEADERS # Files
 
 			# Logger
 			src/cpputils/logger/logger.h
-
-			# Serialization
-			src/cpputils/serialization/serializable.h
 			
 			# Exceptions
 			src/cpputils/exceptions/exception.h
