@@ -5,5 +5,5 @@
 
 class Encryptors {
  public:
-  static std::unique_ptr<Encryptor> GetAES256Encryptor(const ByteArray& key);
+  static std::shared_ptr<Encryptor> GetAES256Encryptor(const ByteArray& key);
 };

@@ -1,6 +1,6 @@
 #include "synchronizers.h"
 
-std::unique_ptr<CountDownLatch> Synchronizers::GetCountDownLatch(
+std::shared_ptr<CountDownLatch> Synchronizers::GetCountDownLatch(
     uint64_t size) {
-  return std::make_unique<CountDownLatch>(size);
+  return std::make_shared<CountDownLatch>(size);
 }

@@ -5,5 +5,5 @@
 
 class Synchronizers {
  public:
-  static std::unique_ptr<CountDownLatch> GetCountDownLatch(uint64_t size);
+  static std::shared_ptr<CountDownLatch> GetCountDownLatch(uint64_t size);
 };
