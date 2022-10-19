@@ -4,13 +4,7 @@ AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
                                      ByteArray key)
     : blockSize(blockSize), keySize(keySize), key(key) {
   if (key.size() != keySize) {
-    throw RuntimeException(
-#if defined(UNICODE) || defined(_UNICODE)
-        L"Invalid key length."
-#else
-        "Invalid key length."
-#endif
-    );
+    throw RuntimeException("Invalid key length.");
   }
 }
 

@@ -7,11 +7,7 @@ void Files::CreateFile(const fs::path& path) {
     fout.open(path, std::ios_base::out);
     fout.close();
   } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-    throw RuntimeException(L"Failed to create file: " + path.wstring());
-#else
     throw RuntimeException("Failed to create file: " + path.string());
-#endif
   }
 }
 
@@ -22,13 +18,8 @@ void Files::CreateDirectory(const fs::path& path) {
     try {
       fs::create_directories(absolutePath);
     } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-      throw RuntimeException(L"Failed to create directory: " +
-                             absolutePath.wstring());
-#else
       throw RuntimeException("Failed to create directory: " +
                              absolutePath.string());
-#endif
     }
   }
 }
@@ -37,12 +28,7 @@ void Files::Remove(const fs::path& path) {
   try {
     fs::remove_all(path);
   } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-    throw RuntimeException(L"Failed to remove file/directory: " +
-                           path.wstring());
-#else
     throw RuntimeException("Failed to remove file/directory: " + path.string());
-#endif
   }
 }
 
@@ -54,13 +40,8 @@ void Files::Copy(const fs::path& sourcePath, const fs::path& targetPath) {
 
     fs::copy(sourcePath, targetPath, options);
   } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-    throw RuntimeException(L"Failed to copy file/directory: " +
-                           sourcePath.wstring());
-#else
     throw RuntimeException("Failed to copy file/directory: " +
                            sourcePath.string());
-#endif
   }
 }
 
@@ -68,13 +49,8 @@ bool Files::Exists(const fs::path& path) {
   try {
     return fs::exists(path);
   } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-    throw RuntimeException(L"Failed to check file/directory existence: " +
-                           path.wstring());
-#else
     throw RuntimeException("Failed to check file/directory existence: " +
                            path.string());
-#endif
   }
   return false;
 }
@@ -83,13 +59,8 @@ uint64_t Files::GetSize(const fs::path& path) {
   try {
     return fs::file_size(path);
   } catch (...) {
-#if defined(UNICODE) || defined(_UNICODE)
-    throw RuntimeException(L"Failed to get file/directory size: " +
-                           path.wstring());
-#else
     throw RuntimeException("Failed to get file/directory size: " +
                            path.string());
-#endif
   }
   return 0;
 }
