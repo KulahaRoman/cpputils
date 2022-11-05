@@ -2,12 +2,12 @@
 #include <cstdint>
 #include <vector>
 
-using ByteArray = std::vector<unsigned char>;
-
 class Encryptor {
  public:
-  virtual ByteArray Encrypt(const ByteArray&) = 0;
-  virtual ByteArray Decrypt(const ByteArray&) = 0;
+  virtual std::vector<unsigned char> Encrypt(
+      const std::vector<unsigned char>&) = 0;
+  virtual std::vector<unsigned char> Decrypt(
+      const std::vector<unsigned char>&) = 0;
   virtual uint64_t GetBlockSize() const = 0;
   virtual uint64_t GetKeySize() const = 0;
 

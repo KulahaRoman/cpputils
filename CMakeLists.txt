@@ -19,6 +19,13 @@ set(SOURCES # Files
 			src/cpputils/encryptors/abstract/abstractencryptor.cpp
 			src/cpputils/encryptors/aes256encryptor/aes256encryptor.cpp
 			src/cpputils/encryptors/aes256encryptor/aes.cpp
+
+			# Hashers
+			src/cpputils/hashers/md5hasher/md5hasher.cpp
+			src/cpputils/hashers/md5hasher/md5.cpp
+			src/cpputils/hashers/sha256hasher/sha256hasher.cpp
+			src/cpputils/hashers/sha256hasher/sha256.cpp
+
 			
 			# Synchronizers
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp

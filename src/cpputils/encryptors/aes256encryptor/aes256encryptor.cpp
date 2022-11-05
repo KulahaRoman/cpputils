@@ -1,13 +1,15 @@
 #include "aes256encryptor.h"
 
-AES256Encryptor::AES256Encryptor(const ByteArray& key)
+AES256Encryptor::AES256Encryptor(const std::vector<unsigned char>& key)
     : AbstractEncryptor(BLOCK_SIZE, KEY_SIZE, key),
       aes(AESKeyLength::AES_256) {}
 
-ByteArray AES256Encryptor::Encrypt(const ByteArray& decryptedData) {
+std::vector<unsigned char> AES256Encryptor::Encrypt(
+    const std::vector<unsigned char>& decryptedData) {
   return aes.EncryptECB(decryptedData, key);
 }
 
-ByteArray AES256Encryptor::Decrypt(const ByteArray& encryptedData) {
+std::vector<unsigned char> AES256Encryptor::Decrypt(
+    const std::vector<unsigned char>& encryptedData) {
   return aes.DecryptECB(encryptedData, key);
 }
