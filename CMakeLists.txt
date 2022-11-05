@@ -16,13 +16,11 @@ set(SOURCES # Files
 			src/cpputils/exceptions/runtimeexception/runtimeexception.cpp
 			
 			# Encryptors
-			src/cpputils/encryptors/encryptors.cpp
 			src/cpputils/encryptors/abstract/abstractencryptor.cpp
 			src/cpputils/encryptors/aes256encryptor/aes256encryptor.cpp
 			src/cpputils/encryptors/aes256encryptor/aes.cpp
 			
 			# Synchronizers
-			src/cpputils/synchronizers/synchronizers.cpp
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp
 )
 
