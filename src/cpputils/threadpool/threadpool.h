@@ -6,6 +6,9 @@
 #include <thread>
 #include <vector>
 
+#include "../exceptions/exception.h"
+#include "../logger/logger.h"
+
 using Task = std::function<void()>;
 
 constexpr auto MIN_THREADS_NUMBER = 4u;
@@ -77,7 +80,10 @@ class ThreadPool {
 
       try {
         task();
-      } catch (...) {
+      } catch (const Exception& ex) {
+#ifndef NDEBUG
+        Logger::Error(ex.GetDescription());
+#endif
         continue;
       }
     }

@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "../exceptions/runtimeexception/runtimeexception.h"
 #include "serializable.h"
 
 class Serializer {
@@ -32,7 +33,7 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(str.size()), binary);
+    Serialize(static_cast<uint64_t>(str.size()), binary);
 
     binary.insert(
         binary.end(), reinterpret_cast<const unsigned char*>(str.data()),
@@ -47,8 +48,7 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(str.size() * sizeof(wchar_t)),
-                          binary);
+    Serialize(static_cast<uint64_t>(str.size() * sizeof(wchar_t)), binary);
 
     binary.insert(binary.end(),
                   reinterpret_cast<const unsigned char*>(str.data()),
@@ -65,11 +65,11 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(map.size()), binary);
+    Serialize(static_cast<uint64_t>(map.size()), binary);
 
     for (const auto& [key, value] : map) {
-      Serializer::Serialize(key, binary);
-      Serializer::Serialize(value, binary);
+      Serialize(key, binary);
+      Serialize(value, binary);
     }
 
     auto newSize = binary.size();
@@ -82,10 +82,10 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(set.size()));
+    Serialize(static_cast<uint64_t>(set.size()));
 
     for (const auto& value : set) {
-      Serializer::Serialize(value, binary);
+      Serialize(value, binary);
     }
 
     auto newSize = binary.size();
@@ -98,10 +98,10 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(list.size()));
+    Serialize(static_cast<uint64_t>(list.size()));
 
     for (const auto& value : list) {
-      Serializer::Serialize(value, binary);
+      Serialize(value, binary);
     }
 
     auto newSize = binary.size();
@@ -114,15 +114,26 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serializer::Serialize(static_cast<uint64_t>(vector.size()));
+    Serialize(static_cast<uint64_t>(vector.size()));
 
     for (const auto& value : vector) {
-      Serializer::Serialize(value, binary);
+      Serialize(value, binary);
     }
 
     auto newSize = binary.size();
 
     return newSize - oldSize;
+  }
+
+  template <class T>
+  static uint64_t Serialize(const std::shared_ptr<T>& obj,
+                            std::vector<unsigned char>& binary) {
+    if (!obj) {
+      throw RuntimeException(
+          "Failed to serialize std::shared_ptr: pointer is null.");
+    }
+
+    return Serialize(*obj, binary);
   }
 
   static uint64_t Serialize(const Serializable& obj,
@@ -145,7 +156,7 @@ class Serializer {
   static uint64_t Deserialize(std::string& str,
                               const std::span<unsigned char>& binary) {
     auto strSize = 0ull;
-    Serializer::Deserialize(strSize, binary);
+    Deserialize(strSize, binary);
 
     str.insert(str.begin(),
                reinterpret_cast<const char*>(binary.data() + sizeof(strSize)),
@@ -158,7 +169,7 @@ class Serializer {
   static uint64_t Deserialize(std::wstring& str,
                               const std::span<unsigned char>& binary) {
     auto strSize = 0ull;
-    Serializer::Deserialize(strSize, binary);
+    Deserialize(strSize, binary);
 
     str.insert(
         str.begin(),
@@ -175,16 +186,16 @@ class Serializer {
     auto nBytes = 0ull;
 
     auto mapSize = 0ull;
-    nBytes += Serializer::Deserialize(mapSize, binary);
+    nBytes += Deserialize(mapSize, binary);
 
     for (auto i = 0ull; i < mapSize; i++) {
       K&& key{};
       V&& value{};
 
-      nBytes += Serializer::Deserialize(
-          key, std::span(binary.begin() + nBytes, binary.end()));
-      nBytes += Serializer::Deserialize(
-          value, std::span(binary.begin() + nBytes, binary.end()));
+      nBytes +=
+          Deserialize(key, std::span(binary.begin() + nBytes, binary.end()));
+      nBytes +=
+          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
 
       map.emplace(std::move(key), std::move(value));
     }
@@ -198,13 +209,13 @@ class Serializer {
     auto nBytes = 0ull;
 
     auto setSize = 0ull;
-    nBytes += Serializer::Deserialize(setSize, binary);
+    nBytes += Deserialize(setSize, binary);
 
     for (auto i = 0ull; i < setSize; i++) {
       T&& value{};
 
-      nBytes += Serializer::Deserialize(
-          value, std::span(binary.begin() + nBytes, binary.end()));
+      nBytes +=
+          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
 
       set.emplace(std::move(value));
     }
@@ -218,13 +229,13 @@ class Serializer {
     auto nBytes = 0ull;
 
     auto listSize = 0ull;
-    nBytes += Serializer::Deserialize(listSize, binary);
+    nBytes += Deserialize(listSize, binary);
 
     for (auto i = 0ull; i < listSize; i++) {
       T&& value{};
 
-      nBytes += Serializer::Deserialize(
-          value, std::span(binary.begin() + nBytes, binary.end()));
+      nBytes +=
+          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
 
       list.emplace_back(std::move(value));
     }
@@ -238,18 +249,28 @@ class Serializer {
     auto nBytes = 0ull;
 
     auto vectorSize = 0ull;
-    nBytes += Serializer::Deserialize(vectorSize, binary);
+    nBytes += Deserialize(vectorSize, binary);
 
     for (auto i = 0ull; i < vectorSize; i++) {
       T&& value{};
 
-      nBytes += Serializer::Deserialize(
-          value, std::span(binary.begin() + nBytes, binary.end()));
+      nBytes +=
+          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
 
       vector.emplace_back(std::move(value));
     }
 
     return nBytes;
+  }
+
+  template <class T>
+  static uint64_t Deserialize(std::shared_ptr<T>& obj,
+                              const std::span<unsigned char>& binary) {
+    if (!obj) {
+      obj = std::make_shared<T>();
+    }
+
+    return Deserialize(*obj, binary);
   }
 
   static uint64_t Deserialize(Serializable& obj,
