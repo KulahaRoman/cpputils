@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 #include <iostream>
 #include <mutex>
 
@@ -27,48 +28,69 @@ enum class ConsoleColor : uint16_t {
 };
 #endif
 
+#define LOGFILE
+
 class Logger {
  public:
-  static void BeginBlock() { mx.lock(); }
+  Logger();
+  ~Logger();
 
-  static void EndBlock() { mx.unlock(); }
+  static void BeginBlock() { getInstance().mx.lock(); }
+
+  static void EndBlock() { getInstance().mx.unlock(); }
 
   template <typename Arg, typename... Args>
   static void Information(Arg&& arg, Args&&... args) noexcept {
-    auto lock = std::unique_lock<std::recursive_mutex>(mx);
+    auto lock = std::unique_lock<std::recursive_mutex>(getInstance().mx);
     setConsoleColor(ConsoleColor::AQUA);
-    print("INFO", std::forward<Arg>(arg), std::forward<Args>(args)...);
+    getInstance().print("INFO", std::forward<Arg>(arg),
+                        std::forward<Args>(args)...);
     setConsoleColor(ConsoleColor::RESET);
   }
 
   template <typename Arg, typename... Args>
   static void Warning(Arg&& arg, Args&&... args) noexcept {
-    auto lock = std::unique_lock<std::recursive_mutex>(mx);
+    auto lock = std::unique_lock<std::recursive_mutex>(getInstance().mx);
     setConsoleColor(ConsoleColor::YELLOW);
-    print("WARNING", std::forward<Arg>(arg), std::forward<Args>(args)...);
+    getInstance().print("WARNING", std::forward<Arg>(arg),
+                        std::forward<Args>(args)...);
     setConsoleColor(ConsoleColor::RESET);
   }
 
   template <typename Arg, typename... Args>
   static void Error(Arg&& arg, Args&&... args) noexcept {
-    auto lock = std::unique_lock<std::recursive_mutex>(mx);
+    auto lock = std::unique_lock<std::recursive_mutex>(getInstance().mx);
     setConsoleColor(ConsoleColor::RED);
-    print("ERROR", std::forward<Arg>(arg), std::forward<Args>(args)...);
+    getInstance().print("ERROR", std::forward<Arg>(arg),
+                        std::forward<Args>(args)...);
     setConsoleColor(ConsoleColor::RESET);
   }
 
   template <typename Arg, typename... Args>
   static void Critical(Arg&& arg, Args&&... args) noexcept {
-    auto lock = std::unique_lock<std::recursive_mutex>(mx);
+    auto lock = std::unique_lock<std::recursive_mutex>(getInstance().mx);
     setConsoleColor(ConsoleColor::PURPLE);
-    print("CRITICAL", std::forward<Arg>(arg), std::forward<Args>(args)...);
+    getInstance().print("CRITICAL", std::forward<Arg>(arg),
+                        std::forward<Args>(args)...);
     setConsoleColor(ConsoleColor::RESET);
   }
 
  private:
+  static Logger& getInstance() {
+    static Logger logger;
+    return logger;
+  }
+
   template <typename Arg, typename... Args>
-  static void print(const std::string& keyWord, Arg&& arg,
-                    Args&&... args) noexcept {
+  void print(const std::string& keyWord, Arg&& arg, Args&&... args) noexcept {
+#ifdef LOGFILE
+    fout << "[THREAD " << std::this_thread::get_id() << "]";
+    fout << "[" << keyWord << "]: ";
+    fout << std::forward<Arg>(arg);
+    ((fout << std::forward<Args>(args)), ...);
+    fout << std::endl;
+#endif
+
     std::cout << "[THREAD " << std::this_thread::get_id() << "]";
     std::cout << "[" << keyWord << "]: ";
     std::cout << std::forward<Arg>(arg);
@@ -86,5 +108,6 @@ class Logger {
   }
 
  private:
-  static std::recursive_mutex mx;
+  std::ofstream fout;
+  std::recursive_mutex mx;
 };

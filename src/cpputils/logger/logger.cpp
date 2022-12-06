@@ -1,3 +1,9 @@
 #include "logger.h"
 
-std::recursive_mutex Logger::mx;
+Logger::Logger() { fout.open("logs.txt", std::ios::out | std::ios::app); }
+
+Logger::~Logger() {
+  if (fout.is_open()) {
+    fout.close();
+  }
+}

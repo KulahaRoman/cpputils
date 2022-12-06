@@ -114,7 +114,7 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serialize(static_cast<uint64_t>(vector.size()));
+    Serialize(static_cast<uint64_t>(vector.size()), binary);
 
     for (const auto& value : vector) {
       Serialize(value, binary);
