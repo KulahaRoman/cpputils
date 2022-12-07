@@ -1,5 +1,6 @@
 #pragma once
-#include "../../exceptions/exceptions.h"
+#include <stdexcept>
+
 #include "../encryptor.h"
 
 class AbstractEncryptor : public Encryptor {

@@ -3,10 +3,10 @@
 #include <functional>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 
-#include "../exceptions/exception.h"
 #include "../logger/logger.h"
 
 using Task = std::function<void()>;
@@ -80,9 +80,15 @@ class ThreadPool {
 
       try {
         task();
-      } catch (const Exception& ex) {
+      } catch (const std::exception&
 #ifndef NDEBUG
-        Logger::Error(ex.GetDescription());
+                   ex
+#else
+      // blank
+#endif
+      ) {
+#ifndef NDEBUG
+        Logger::Error(ex.what());
 #endif
         continue;
       }

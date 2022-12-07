@@ -11,10 +11,6 @@ set(SOURCES # Files
 			# Logger
 			src/cpputils/logger/logger.cpp
 			
-			# Exceptions
-			src/cpputils/exceptions/exception.cpp
-			src/cpputils/exceptions/runtimeexception/runtimeexception.cpp
-			
 			# Encryptors
 			src/cpputils/encryptors/abstract/abstractencryptor.cpp
 			src/cpputils/encryptors/aes256encryptor/aes256encryptor.cpp

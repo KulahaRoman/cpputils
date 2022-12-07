@@ -5,11 +5,11 @@
 #include <memory>
 #include <set>
 #include <span>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-#include "../exceptions/runtimeexception/runtimeexception.h"
 #include "serializable.h"
 
 class Serializer {
@@ -129,8 +129,8 @@ class Serializer {
   static uint64_t Serialize(const std::shared_ptr<T>& obj,
                             std::vector<unsigned char>& binary) {
     if (!obj) {
-      throw RuntimeException(
-          "Failed to serialize std::shared_ptr: pointer is null.");
+      throw std::runtime_error(
+          "Failed to serialize std::shared_ptr<T>: pointer is null.");
     }
 
     return Serialize(*obj, binary);

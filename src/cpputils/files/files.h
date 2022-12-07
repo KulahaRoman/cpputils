@@ -1,8 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <fstream>
-
-#include "../exceptions/exceptions.h"
+#include <stdexcept>
 
 #ifdef _WIN32
 #undef CreateFile
