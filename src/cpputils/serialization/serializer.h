@@ -82,7 +82,7 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serialize(static_cast<uint64_t>(set.size()));
+    Serialize(static_cast<uint64_t>(set.size()), binary);
 
     for (const auto& value : set) {
       Serialize(value, binary);
@@ -98,7 +98,7 @@ class Serializer {
                             std::vector<unsigned char>& binary) {
     auto oldSize = binary.size();
 
-    Serialize(static_cast<uint64_t>(list.size()));
+    Serialize(static_cast<uint64_t>(list.size()), binary);
 
     for (const auto& value : list) {
       Serialize(value, binary);
