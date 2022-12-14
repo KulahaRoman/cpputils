@@ -144,7 +144,7 @@ class Serializer {
   template <class T, class Enable = typename std::enable_if<
                          std::is_integral<T>::value>::type>
   static uint64_t Deserialize(T& value,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     std::copy(
         reinterpret_cast<const unsigned char*>(binary.data()),
         reinterpret_cast<const unsigned char*>(binary.data() + sizeof(value)),
@@ -154,7 +154,7 @@ class Serializer {
   }
 
   static uint64_t Deserialize(std::string& str,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto strSize = 0ull;
     Deserialize(strSize, binary);
 
@@ -167,7 +167,7 @@ class Serializer {
   }
 
   static uint64_t Deserialize(std::wstring& str,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto strSize = 0ull;
     Deserialize(strSize, binary);
 
@@ -182,7 +182,7 @@ class Serializer {
 
   template <class K, class V>
   static uint64_t Deserialize(std::map<K, V>& map,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto nBytes = 0ull;
 
     auto mapSize = 0ull;
@@ -205,7 +205,7 @@ class Serializer {
 
   template <class T>
   static uint64_t Deserialize(std::set<T>& set,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto nBytes = 0ull;
 
     auto setSize = 0ull;
@@ -225,7 +225,7 @@ class Serializer {
 
   template <class T>
   static uint64_t Deserialize(std::list<T>& list,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto nBytes = 0ull;
 
     auto listSize = 0ull;
@@ -245,7 +245,7 @@ class Serializer {
 
   template <class T>
   static uint64_t Deserialize(std::vector<T>& vector,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     auto nBytes = 0ull;
 
     auto vectorSize = 0ull;
@@ -265,7 +265,7 @@ class Serializer {
 
   template <class T>
   static uint64_t Deserialize(std::shared_ptr<T>& obj,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     if (!obj) {
       obj = std::make_shared<T>();
     }
@@ -274,7 +274,7 @@ class Serializer {
   }
 
   static uint64_t Deserialize(Serializable& obj,
-                              const std::span<unsigned char>& binary) {
+                              const std::span<const unsigned char>& binary) {
     return obj.Deserialize(binary);
   }
 };
