@@ -29,4 +29,7 @@ set(SOURCES # Files
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
+add_subdirectory(libs/spdlog)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
