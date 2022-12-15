@@ -14,7 +14,7 @@ class Logger {
   Logger();
 
   template <typename... Args>
-  static void Information(const std::string& fmt, Args&&... args) noexcept {
+  static void Information(fmt::format_string<Args...> fmt, Args&&... args) {
     getInstance().console->info(fmt, std::forward<Args>(args)...);
 
     if (LOG_TO_FILE) {
@@ -23,7 +23,7 @@ class Logger {
   }
 
   template <typename... Args>
-  static void Warning(const std::string& fmt, Args&&... args) noexcept {
+  static void Warning(fmt::format_string<Args...> fmt, Args&&... args) {
     getInstance().console->warn(fmt, std::forward<Args>(args)...);
 
     if (LOG_TO_FILE) {
@@ -32,7 +32,7 @@ class Logger {
   }
 
   template <typename... Args>
-  static void Error(const std::string& fmt, Args&&... args) noexcept {
+  static void Error(fmt::format_string<Args...> fmt, Args&&... args) {
     getInstance().console->error(fmt, std::forward<Args>(args)...);
 
     if (LOG_TO_FILE) {
@@ -41,7 +41,7 @@ class Logger {
   }
 
   template <typename... Args>
-  static void Critical(const std::string& fmt, Args&&... args) noexcept {
+  static void Critical(fmt::format_string<Args...> fmt, Args&&... args) {
     getInstance().console->critical(fmt, std::forward<Args>(args)...);
 
     if (LOG_TO_FILE) {
