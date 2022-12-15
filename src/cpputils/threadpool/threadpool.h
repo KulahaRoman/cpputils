@@ -88,7 +88,7 @@ class ThreadPool {
 #endif
       ) {
 #ifndef NDEBUG
-        Logger::Error(ex.what());
+        Logger::Error("ThreadPool caught exception: {}", ex.what());
 #endif
         continue;
       }
