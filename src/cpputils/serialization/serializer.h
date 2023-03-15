@@ -135,7 +135,7 @@ class Serializer {
 
       str.resize(strSize);
 
-      archive.Read(str.data(), strSize);
+      archive.Read(reinterpret_cast<unsigned char*>(str.data()), strSize);
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::string.");
     }
