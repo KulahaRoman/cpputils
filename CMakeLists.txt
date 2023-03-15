@@ -22,6 +22,9 @@ set(SOURCES # Files
 			src/cpputils/hashers/sha256hasher/sha256hasher.cpp
 			src/cpputils/hashers/sha256hasher/sha256.cpp
 
+			# Serialization
+			src/cpputils/serialization/binaryarchive.cpp
+
 			
 			# Synchronizers
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp

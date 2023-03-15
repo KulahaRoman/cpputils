@@ -4,277 +4,245 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <span>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
 
+#include "binaryarchive.h"
 #include "serializable.h"
 
 class Serializer {
  public:
   template <class T, class Enable = typename std::enable_if<
                          std::is_integral<T>::value>::type>
-  static const uint64_t Serialize(const T value,
-                                  std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
-
-    binary.insert(
-        binary.end(), reinterpret_cast<const unsigned char*>(&value),
-        reinterpret_cast<const unsigned char*>(&value) + sizeof(value));
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
+  static void Serialize(const T value, BinaryArchive& archive) {
+    try {
+      archive.Write(reinterpret_cast<const unsigned char*>(&value),
+                    sizeof(value));
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize integral type value.");
+    }
   }
 
-  static uint64_t Serialize(const std::string& str,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::string& str, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(str.size()), archive);
 
-    Serialize(static_cast<uint64_t>(str.size()), binary);
-
-    binary.insert(
-        binary.end(), reinterpret_cast<const unsigned char*>(str.data()),
-        reinterpret_cast<const unsigned char*>(str.data()) + str.size());
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
+      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
+                    static_cast<uint64_t>(str.size()));
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::string.");
+    }
   }
 
-  static uint64_t Serialize(const std::wstring& str,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::wstring& str, BinaryArchive& archive) {
+    auto strSizeInBytes = static_cast<uint64_t>(str.size() * sizeof(wchar_t));
 
-    Serialize(static_cast<uint64_t>(str.size() * sizeof(wchar_t)), binary);
+    try {
+      Serialize(strSizeInBytes, archive);
 
-    binary.insert(binary.end(),
-                  reinterpret_cast<const unsigned char*>(str.data()),
-                  reinterpret_cast<const unsigned char*>(str.data()) +
-                      str.size() * sizeof(wchar_t));
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
+      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
+                    strSizeInBytes);
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::wstring.");
+    }
   }
 
   template <class K, class V>
-  static uint64_t Serialize(const std::map<K, V>& map,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::map<K, V>& map, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(map.size()), archive);
 
-    Serialize(static_cast<uint64_t>(map.size()), binary);
-
-    for (const auto& [key, value] : map) {
-      Serialize(key, binary);
-      Serialize(value, binary);
+      for (const auto& [key, value] : map) {
+        Serialize(key, archive);
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::map<K,V>.");
     }
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
   }
 
   template <class T>
-  static uint64_t Serialize(const std::set<T>& set,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::set<T>& set, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(set.size()), archive);
 
-    Serialize(static_cast<uint64_t>(set.size()), binary);
-
-    for (const auto& value : set) {
-      Serialize(value, binary);
+      for (const auto& value : set) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::set<T>.");
     }
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
   }
 
   template <class T>
-  static uint64_t Serialize(const std::list<T>& list,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::list<T>& list, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(list.size()), archive);
 
-    Serialize(static_cast<uint64_t>(list.size()), binary);
-
-    for (const auto& value : list) {
-      Serialize(value, binary);
+      for (const auto& value : list) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::list<T>.");
     }
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
   }
 
   template <class T>
-  static uint64_t Serialize(const std::vector<T>& vector,
-                            std::vector<unsigned char>& binary) {
-    auto oldSize = binary.size();
+  static void Serialize(const std::vector<T>& vector, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(vector.size()), archive);
 
-    Serialize(static_cast<uint64_t>(vector.size()), binary);
-
-    for (const auto& value : vector) {
-      Serialize(value, binary);
+      for (const auto& value : vector) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::vector<T>.");
     }
-
-    auto newSize = binary.size();
-
-    return newSize - oldSize;
   }
 
   template <class T>
-  static uint64_t Serialize(const std::shared_ptr<T>& obj,
-                            std::vector<unsigned char>& binary) {
+  static void Serialize(const std::shared_ptr<T>& obj, BinaryArchive& archive) {
     if (!obj) {
       throw std::runtime_error(
           "Failed to serialize std::shared_ptr<T>: pointer is null.");
     }
 
-    return Serialize(*obj, binary);
+    Serialize(*obj, archive);
   }
 
-  static uint64_t Serialize(const Serializable& obj,
-                            std::vector<unsigned char>& binary) {
-    return obj.Serialize(binary);
+  static void Serialize(const Serializable& obj, BinaryArchive& archive) {
+    obj.Serialize(archive);
   }
 
   template <class T, class Enable = typename std::enable_if<
                          std::is_integral<T>::value>::type>
-  static uint64_t Deserialize(T& value,
-                              const std::span<const unsigned char>& binary) {
-    std::copy(
-        reinterpret_cast<const unsigned char*>(binary.data()),
-        reinterpret_cast<const unsigned char*>(binary.data() + sizeof(value)),
-        reinterpret_cast<unsigned char*>(&value));
-
-    return sizeof(value);
+  static void Deserialize(T& value, BinaryArchive& archive) {
+    try {
+      archive.Read(reinterpret_cast<unsigned char*>(&value),
+                   static_cast<uint64_t>(sizeof(value)));
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize integral type value.");
+    }
   }
 
-  static uint64_t Deserialize(std::string& str,
-                              const std::span<const unsigned char>& binary) {
+  static void Deserialize(std::string& str, BinaryArchive& archive) {
     auto strSize = 0ull;
-    Deserialize(strSize, binary);
 
-    str.insert(str.begin(),
-               reinterpret_cast<const char*>(binary.data() + sizeof(strSize)),
-               reinterpret_cast<const char*>(binary.data() + sizeof(strSize)) +
-                   strSize);
+    try {
+      Deserialize(strSize, archive);
 
-    return strSize + sizeof(strSize);
+      str.resize(strSize);
+
+      archive.Read(str.data(), strSize);
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::string.");
+    }
   }
 
-  static uint64_t Deserialize(std::wstring& str,
-                              const std::span<const unsigned char>& binary) {
+  static void Deserialize(std::wstring& str, BinaryArchive& archive) {
     auto strSize = 0ull;
-    Deserialize(strSize, binary);
 
-    str.insert(
-        str.begin(),
-        reinterpret_cast<const wchar_t*>(binary.data() + sizeof(strSize)),
-        reinterpret_cast<const wchar_t*>(binary.data() + sizeof(strSize)) +
-            strSize / sizeof(wchar_t));
+    try {
+      Deserialize(strSize, archive);
 
-    return strSize + sizeof(strSize);
+      str.resize(strSize / sizeof(wchar_t));
+
+      archive.Read(reinterpret_cast<unsigned char*>(str.data()), strSize);
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::wstring.");
+    }
   }
 
   template <class K, class V>
-  static uint64_t Deserialize(std::map<K, V>& map,
-                              const std::span<const unsigned char>& binary) {
-    auto nBytes = 0ull;
-
+  static void Deserialize(std::map<K, V>& map, BinaryArchive& archive) {
     auto mapSize = 0ull;
-    nBytes += Deserialize(mapSize, binary);
 
-    for (auto i = 0ull; i < mapSize; i++) {
-      K&& key{};
-      V&& value{};
+    try {
+      Deserialize(mapSize, archive);
 
-      nBytes +=
-          Deserialize(key, std::span(binary.begin() + nBytes, binary.end()));
-      nBytes +=
-          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
+      for (auto i = 0ull; i < mapSize; i++) {
+        K&& key{};
+        V&& value{};
 
-      map.emplace(std::move(key), std::move(value));
+        Deserialize(key, archive);
+        Deserialize(value, archive);
+
+        map.emplace(std::move(key), std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::map<K,V>.");
     }
-
-    return nBytes;
   }
 
   template <class T>
-  static uint64_t Deserialize(std::set<T>& set,
-                              const std::span<const unsigned char>& binary) {
-    auto nBytes = 0ull;
-
+  static void Deserialize(std::set<T>& set, BinaryArchive& archive) {
     auto setSize = 0ull;
-    nBytes += Deserialize(setSize, binary);
 
-    for (auto i = 0ull; i < setSize; i++) {
-      T&& value{};
+    try {
+      Deserialize(setSize, archive);
 
-      nBytes +=
-          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
+      for (auto i = 0ull; i < setSize; i++) {
+        T&& value{};
 
-      set.emplace(std::move(value));
+        Deserialize(value, archive);
+
+        set.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::set<T>.");
     }
-
-    return nBytes;
   }
 
   template <class T>
-  static uint64_t Deserialize(std::list<T>& list,
-                              const std::span<const unsigned char>& binary) {
-    auto nBytes = 0ull;
-
+  static void Deserialize(std::list<T>& list, BinaryArchive& archive) {
     auto listSize = 0ull;
-    nBytes += Deserialize(listSize, binary);
 
-    for (auto i = 0ull; i < listSize; i++) {
-      T&& value{};
+    try {
+      Deserialize(listSize, archive);
 
-      nBytes +=
-          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
+      for (auto i = 0ull; i < listSize; i++) {
+        T&& value{};
 
-      list.emplace_back(std::move(value));
+        Deserialize(value, archive);
+
+        list.emplace_back(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::list<T>.");
     }
-
-    return nBytes;
   }
 
   template <class T>
-  static uint64_t Deserialize(std::vector<T>& vector,
-                              const std::span<const unsigned char>& binary) {
-    auto nBytes = 0ull;
-
+  static void Deserialize(std::vector<T>& vector, BinaryArchive& archive) {
     auto vectorSize = 0ull;
-    nBytes += Deserialize(vectorSize, binary);
 
-    for (auto i = 0ull; i < vectorSize; i++) {
-      T&& value{};
+    try {
+      Deserialize(vectorSize, archive);
 
-      nBytes +=
-          Deserialize(value, std::span(binary.begin() + nBytes, binary.end()));
+      for (auto i = 0ull; i < vectorSize; i++) {
+        T&& value{};
 
-      vector.emplace_back(std::move(value));
+        Deserialize(value, archive);
+
+        vector.emplace_back(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::vector<T>.");
     }
-
-    return nBytes;
   }
 
   template <class T>
-  static uint64_t Deserialize(std::shared_ptr<T>& obj,
-                              const std::span<const unsigned char>& binary) {
+  static void Deserialize(std::shared_ptr<T>& obj, BinaryArchive& archive) {
     if (!obj) {
       obj = std::make_shared<T>();
     }
 
-    return Deserialize(*obj, binary);
+    Deserialize(*obj, archive);
   }
 
-  static uint64_t Deserialize(Serializable& obj,
-                              const std::span<const unsigned char>& binary) {
-    return obj.Deserialize(binary);
+  static void Deserialize(Serializable& obj, BinaryArchive& archive) {
+    obj.Deserialize(archive);
   }
 };
