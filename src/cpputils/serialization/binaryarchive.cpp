@@ -6,7 +6,7 @@ BinaryArchive::BinaryArchive(uint64_t capacity) : ppos(0ull), gpos(0ull) {
 
 void BinaryArchive::Read(unsigned char* const data, uint64_t size) {
   try {
-    if (gpos + size >= this->data.size()) {
+    if (gpos + size > this->data.size()) {
       throw std::runtime_error("Reading position out of bound.");
     }
 
