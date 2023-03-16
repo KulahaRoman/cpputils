@@ -6,6 +6,18 @@ constexpr uint64_t INITIAL_CAPACITY = 128ull;
 
 class BinaryArchive {
  public:
+#ifdef BEGIN
+#undef BEGIN
+#endif
+
+#ifdef END
+#undef END
+#endif
+
+#ifdef RELATIVE
+#undef RELATIVE
+#endif
+
   // Describes positioning logic.
   // 'BEGIN' - position adjusting relatively to the begin of the internal
   // storage; 'END' - position adjusting relatively to the end of the internal
