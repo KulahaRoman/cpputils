@@ -31,9 +31,34 @@ void BinaryArchive::Write(const unsigned char* const data, uint64_t size) {
   }
 }
 
-void BinaryArchive::Reset() {
-  ppos = 0ull;
-  gpos = 0ull;
+uint64_t BinaryArchive::GetReadPosition(SeekDirection seekDir) const {
+  return calculateCurrentPosition(SeekType::READ, seekDir);
+}
+
+void BinaryArchive::SetReadPosition(uint64_t pos, SeekDirection seekDir) {
+  auto storageSize = static_cast<uint64_t>(data.size());
+  auto newPosition = calculateNewPosition(pos, SeekType::READ, seekDir);
+
+  if (newPosition >= storageSize) {
+    throw std::runtime_error("BinaryArchive position out of bounds.");
+  }
+
+  gpos = newPosition;
+}
+
+uint64_t BinaryArchive::GetWritePosition(SeekDirection seekDir) const {
+  return calculateCurrentPosition(SeekType::WRITE, seekDir);
+}
+
+void BinaryArchive::SetWritePosition(uint64_t pos, SeekDirection seekDir) {
+  auto storageSize = static_cast<uint64_t>(data.size());
+  auto newPosition = calculateNewPosition(pos, SeekType::WRITE, seekDir);
+
+  if (newPosition >= storageSize) {
+    throw std::runtime_error("BinaryArchive position out of bounds.");
+  }
+
+  ppos = newPosition;
 }
 
 void BinaryArchive::Clear() {
@@ -43,7 +68,8 @@ void BinaryArchive::Clear() {
     throw std::runtime_error("Failed to clear internal storage.");
   }
 
-  Reset();
+  gpos = 0ull;
+  ppos = 0ull;
 }
 
 uint64_t BinaryArchive::GetSize() const {
@@ -52,4 +78,49 @@ uint64_t BinaryArchive::GetSize() const {
 
 const unsigned char* BinaryArchive::GetDataPointer() const {
   return data.data();
+}
+
+uint64_t BinaryArchive::calculateNewPosition(uint64_t pos, SeekType seekType,
+                                             SeekDirection seekDir) const {
+  auto storageSize = static_cast<uint64_t>(data.size());
+  auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);
+  auto calculatedPosition = 0ull;
+
+  switch (seekDir) {
+    case SeekDirection::BEGIN: {
+      calculatedPosition = pos;
+      break;
+    }
+    case SeekDirection::END: {
+      calculatedPosition = storageSize - 1 - pos;
+      break;
+    }
+    case SeekDirection::RELATIVE: {
+      calculatedPosition = currentPosition + pos;
+      break;
+    }
+  }
+
+  return calculatedPosition;
+}
+
+uint64_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
+                                                 SeekDirection seekDir) const {
+  auto storageSize = static_cast<uint64_t>(data.size());
+  auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);
+  auto calculatedPosition = 0ull;
+
+  switch (seekDir) {
+    case SeekDirection::BEGIN: {
+      calculatedPosition = currentPosition;
+    }
+    case SeekDirection::END: {
+      calculatedPosition = storageSize - 1 - currentPosition;
+    }
+    case SeekDirection::RELATIVE: {
+      calculatedPosition = 0ull;
+    }
+  }
+
+  return calculatedPosition;
 }
