@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <vector>
 
-constexpr uint64_t INITIAL_CAPACITY = 64ull;
+constexpr uint64_t INITIAL_CAPACITY = 128ull;
 
 class BinaryArchive {
  public:
