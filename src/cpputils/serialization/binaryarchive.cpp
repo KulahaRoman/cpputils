@@ -113,12 +113,15 @@ uint64_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
   switch (seekDir) {
     case SeekDirection::BEGIN: {
       calculatedPosition = currentPosition;
+      break;
     }
     case SeekDirection::END: {
       calculatedPosition = storageSize - 1 - currentPosition;
+      break;
     }
     case SeekDirection::RELATIVE: {
       calculatedPosition = 0ull;
+      break;
     }
   }
 
