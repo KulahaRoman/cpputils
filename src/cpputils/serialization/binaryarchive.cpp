@@ -10,11 +10,13 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
       return;
     }
 
-    if (static_cast<std::size_t>(gpos) + size > this->data.size()) {
+    auto currentPosition = gpos == -1 ? 0 : gpos;
+
+    if (static_cast<std::size_t>(currentPosition) + size > this->data.size()) {
       throw std::runtime_error("Reading position out of bound.");
     }
 
-    auto beginPosition = this->data.begin() + gpos;
+    auto beginPosition = this->data.begin() + currentPosition;
     auto endPosition = beginPosition + static_cast<int32_t>(size);
 
     std::copy(beginPosition, endPosition, data);
@@ -31,7 +33,9 @@ void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
       return;
     }
 
-    this->data.insert(this->data.begin() + ppos, data,
+    auto currentPosition = ppos == -1 ? 0 : ppos;
+
+    this->data.insert(this->data.begin() + currentPosition, data,
                       data + static_cast<int32_t>(size));
 
     ppos += static_cast<int32_t>(size);
