@@ -49,6 +49,16 @@ class Serializer {
     }
   }
 
+  template <class T1, class T2>
+  static void Serialize(const std::pair<T1, T2>& pair, BinaryArchive& archive) {
+    try {
+      Serialize(pair.first, archive);
+      Serialize(pair.second, archive);
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::pair<T1,T2>.");
+    }
+  }
+
   template <class K, class V>
   static void Serialize(const std::map<K, V>& map, BinaryArchive& archive) {
     try {
@@ -152,6 +162,22 @@ class Serializer {
       archive.Read(reinterpret_cast<unsigned char*>(str.data()), strSize);
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::wstring.");
+    }
+  }
+
+  template <class T1, class T2>
+  static void Deserialize(std::pair<T1, T2>& pair, BinaryArchive& archive) {
+    try {
+      T1&& first{};
+      T2&& second{};
+
+      Deserialize(first, archive);
+      Deserialize(second, archive);
+
+      pair.first = first;
+      pair.second = second;
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::pair<T1,T2>.");
     }
   }
 
