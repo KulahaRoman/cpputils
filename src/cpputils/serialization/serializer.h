@@ -40,85 +40,85 @@ class Serializer {
 
   static void Serialize(const std::wstring& str, BinaryArchive& archive) {
     try {
-        auto strSizeInBytes = static_cast<uint64_t>(str.size() * sizeof(wchar_t)));
+      auto strSizeInBytes = static_cast<uint64_t>(str.size() * sizeof(wchar_t));
 
-        Serialize(strSizeInBytes, archive);
+      Serialize(strSizeInBytes, archive);
 
-        archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
-                      static_cast<std::size_t>(strSizeInBytes));
+      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
+                    static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::wstring.");
+      throw std::runtime_error("Failed to serialize std::wstring.");
     }
   }
 
   template <class T1, class T2>
   static void Serialize(const std::pair<T1, T2>& pair, BinaryArchive& archive) {
     try {
-        Serialize(pair.first, archive);
-        Serialize(pair.second, archive);
+      Serialize(pair.first, archive);
+      Serialize(pair.second, archive);
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::pair<T1,T2>.");
+      throw std::runtime_error("Failed to serialize std::pair<T1,T2>.");
     }
   }
 
   template <class K, class V>
   static void Serialize(const std::map<K, V>& map, BinaryArchive& archive) {
     try {
-        Serialize(static_cast<uint64_t>(map.size()), archive);
+      Serialize(static_cast<uint64_t>(map.size()), archive);
 
-        for (const auto& [key, value] : map) {
-          Serialize(key, archive);
-          Serialize(value, archive);
-        }
+      for (const auto& [key, value] : map) {
+        Serialize(key, archive);
+        Serialize(value, archive);
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::map<K,V>.");
+      throw std::runtime_error("Failed to serialize std::map<K,V>.");
     }
   }
 
   template <class T>
   static void Serialize(const std::set<T>& set, BinaryArchive& archive) {
     try {
-        Serialize(static_cast<uint64_t>(set.size()), archive);
+      Serialize(static_cast<uint64_t>(set.size()), archive);
 
-        for (const auto& value : set) {
-          Serialize(value, archive);
-        }
+      for (const auto& value : set) {
+        Serialize(value, archive);
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::set<T>.");
+      throw std::runtime_error("Failed to serialize std::set<T>.");
     }
   }
 
   template <class T>
   static void Serialize(const std::list<T>& list, BinaryArchive& archive) {
     try {
-        Serialize(static_cast<uint64_t>(list.size()), archive);
+      Serialize(static_cast<uint64_t>(list.size()), archive);
 
-        for (const auto& value : list) {
-          Serialize(value, archive);
-        }
+      for (const auto& value : list) {
+        Serialize(value, archive);
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::list<T>.");
+      throw std::runtime_error("Failed to serialize std::list<T>.");
     }
   }
 
   template <class T>
   static void Serialize(const std::vector<T>& vector, BinaryArchive& archive) {
     try {
-        Serialize(static_cast<uint64_t>(vector.size()), archive);
+      Serialize(static_cast<uint64_t>(vector.size()), archive);
 
-        for (const auto& value : vector) {
-          Serialize(value, archive);
-        }
+      for (const auto& value : vector) {
+        Serialize(value, archive);
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to serialize std::vector<T>.");
+      throw std::runtime_error("Failed to serialize std::vector<T>.");
     }
   }
 
   template <class T>
   static void Serialize(const std::shared_ptr<T>& obj, BinaryArchive& archive) {
     if (!obj) {
-        throw std::runtime_error(
-            "Failed to serialize std::shared_ptr<T>: pointer is null.");
+      throw std::runtime_error(
+          "Failed to serialize std::shared_ptr<T>: pointer is null.");
     }
 
     Serialize(*obj, archive);
@@ -132,55 +132,55 @@ class Serializer {
                          std::is_integral<T>::value>::type>
   static void Deserialize(T& value, BinaryArchive& archive) {
     try {
-        archive.Read(reinterpret_cast<unsigned char*>(&value), sizeof(value));
+      archive.Read(reinterpret_cast<unsigned char*>(&value), sizeof(value));
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize integral type value.");
+      throw std::runtime_error("Failed to deserialize integral type value.");
     }
   }
 
   static void Deserialize(std::string& str, BinaryArchive& archive) {
     try {
-        auto strSizeInBytes = 0ull;
+      auto strSizeInBytes = 0ull;
 
-        Deserialize(strSizeInBytes, archive);
+      Deserialize(strSizeInBytes, archive);
 
-        str.resize(static_cast<std::size_t>(strSizeInBytes));
+      str.resize(static_cast<std::size_t>(strSizeInBytes));
 
-        archive.Read(reinterpret_cast<unsigned char*>(str.data()),
-                     static_cast<std::size_t>(strSizeInBytes));
+      archive.Read(reinterpret_cast<unsigned char*>(str.data()),
+                   static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::string.");
+      throw std::runtime_error("Failed to deserialize std::string.");
     }
   }
 
   static void Deserialize(std::wstring& str, BinaryArchive& archive) {
     try {
-        auto strSizeInBytes = 0ull;
+      auto strSizeInBytes = 0ull;
 
-        Deserialize(strSizeInBytes, archive);
+      Deserialize(strSizeInBytes, archive);
 
-        str.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
+      str.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
 
-        archive.Read(reinterpret_cast<unsigned char*>(str.data()),
-                     static_cast<std::size_t>(strSizeInBytes));
+      archive.Read(reinterpret_cast<unsigned char*>(str.data()),
+                   static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::wstring.");
+      throw std::runtime_error("Failed to deserialize std::wstring.");
     }
   }
 
   template <class T1, class T2>
   static void Deserialize(std::pair<T1, T2>& pair, BinaryArchive& archive) {
     try {
-        T1&& first{};
-        T2&& second{};
+      T1&& first{};
+      T2&& second{};
 
-        Deserialize(first, archive);
-        Deserialize(second, archive);
+      Deserialize(first, archive);
+      Deserialize(second, archive);
 
-        pair.first = first;
-        pair.second = second;
+      pair.first = first;
+      pair.second = second;
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::pair<T1,T2>.");
+      throw std::runtime_error("Failed to deserialize std::pair<T1,T2>.");
     }
   }
 
@@ -189,19 +189,19 @@ class Serializer {
     auto mapSize = 0ull;
 
     try {
-        Deserialize(mapSize, archive);
+      Deserialize(mapSize, archive);
 
-        for (auto i = 0ull; i < mapSize; i++) {
-          K&& key{};
-          V&& value{};
+      for (auto i = 0ull; i < mapSize; i++) {
+        K&& key{};
+        V&& value{};
 
-          Deserialize(key, archive);
-          Deserialize(value, archive);
+        Deserialize(key, archive);
+        Deserialize(value, archive);
 
-          map.emplace(std::move(key), std::move(value));
-        }
+        map.emplace(std::move(key), std::move(value));
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::map<K,V>.");
+      throw std::runtime_error("Failed to deserialize std::map<K,V>.");
     }
   }
 
@@ -210,17 +210,17 @@ class Serializer {
     auto setSize = 0ull;
 
     try {
-        Deserialize(setSize, archive);
+      Deserialize(setSize, archive);
 
-        for (auto i = 0ull; i < setSize; i++) {
-          T&& value{};
+      for (auto i = 0ull; i < setSize; i++) {
+        T&& value{};
 
-          Deserialize(value, archive);
+        Deserialize(value, archive);
 
-          set.emplace(std::move(value));
-        }
+        set.emplace(std::move(value));
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::set<T>.");
+      throw std::runtime_error("Failed to deserialize std::set<T>.");
     }
   }
 
@@ -229,17 +229,17 @@ class Serializer {
     auto listSize = 0ull;
 
     try {
-        Deserialize(listSize, archive);
+      Deserialize(listSize, archive);
 
-        for (auto i = 0ull; i < listSize; i++) {
-          T&& value{};
+      for (auto i = 0ull; i < listSize; i++) {
+        T&& value{};
 
-          Deserialize(value, archive);
+        Deserialize(value, archive);
 
-          list.emplace_back(std::move(value));
-        }
+        list.emplace_back(std::move(value));
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::list<T>.");
+      throw std::runtime_error("Failed to deserialize std::list<T>.");
     }
   }
 
@@ -248,24 +248,24 @@ class Serializer {
     auto vectorSize = 0ull;
 
     try {
-        Deserialize(vectorSize, archive);
+      Deserialize(vectorSize, archive);
 
-        for (auto i = 0ull; i < vectorSize; i++) {
-          T&& value{};
+      for (auto i = 0ull; i < vectorSize; i++) {
+        T&& value{};
 
-          Deserialize(value, archive);
+        Deserialize(value, archive);
 
-          vector.emplace_back(std::move(value));
-        }
+        vector.emplace_back(std::move(value));
+      }
     } catch (...) {
-        throw std::runtime_error("Failed to deserialize std::vector<T>.");
+      throw std::runtime_error("Failed to deserialize std::vector<T>.");
     }
   }
 
   template <class T>
   static void Deserialize(std::shared_ptr<T>& obj, BinaryArchive& archive) {
     if (!obj) {
-        obj = std::make_shared<T>();
+      obj = std::make_shared<T>();
     }
 
     Deserialize(*obj, archive);
