@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <vector>
 
-constexpr size_t INITIAL_CAPACITY = 128ull;
+constexpr std::size_t INITIAL_CAPACITY = 128ull;
 
 class BinaryArchive {
  public:
@@ -27,20 +27,20 @@ class BinaryArchive {
 
   // Constructs instance and reserves memory for internal storage. By
   // default, storage initial capacity equals 'INITIAL_CAPACITY' constant value.
-  BinaryArchive(size_t capacity = INITIAL_CAPACITY);
+  BinaryArchive(std::size_t capacity = INITIAL_CAPACITY);
 
   // Copies 'size' amount of data from the internal storage to the memory
   // location, pointed by 'data' argument. Affects reading position, increasing
   // it by 'size' argument value. Throws exception if 'size' argument value
   // exceeds internal storage bound, considering last reading position.
-  void Read(unsigned char* const data, uint32_t size);
+  void Read(unsigned char* const data, std::size_t size);
 
   // Copies 'size' amount of data from the memory location, pointed by 'data'
   // argument to internal storage. Affects writing position, increasing it by
   // 'size' argument value.
   // Expands internal storage size while inserting new data.
   // Throws exception if internal storage expanding failed.
-  void Write(const unsigned char* const data, uint32_t size);
+  void Write(const unsigned char* const data, std::size_t size);
 
   // Returns current reading position depending on seek direction.
   int32_t GetReadPosition(SeekDirection seekDir = SeekDirection::BEGIN) const;
@@ -62,7 +62,7 @@ class BinaryArchive {
   void Clear();
 
   // Returns size of internal storage.
-  size_t GetSize() const;
+  std::size_t GetSize() const;
 
   // Returns data pointer to first element of internal storage.
   const unsigned char* GetDataPointer() const;

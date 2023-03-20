@@ -1,39 +1,40 @@
 #include "binaryarchive.h"
 
-BinaryArchive::BinaryArchive(size_t capacity) : ppos(-1), gpos(-1) {
+BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(-1), gpos(-1) {
   data.reserve(capacity);
 }
 
-void BinaryArchive::Read(unsigned char* const data, uint32_t size) {
+void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
   try {
     if (size == 0) {
       return;
     }
 
-    if (gpos + size > this->data.size()) {
+    if (static_cast<std::size_t>(gpos) + size > this->data.size()) {
       throw std::runtime_error("Reading position out of bound.");
     }
 
     auto beginPosition = this->data.begin() + gpos;
-    auto endPosition = beginPosition + size;
+    auto endPosition = beginPosition + static_cast<int32_t>(size);
 
     std::copy(beginPosition, endPosition, data);
 
-    gpos += size;
+    gpos += static_cast<int32_t>(size);
   } catch (...) {
     throw std::runtime_error("Failed to read data from internal storage.");
   }
 }
 
-void BinaryArchive::Write(const unsigned char* const data, uint32_t size) {
+void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
   try {
     if (size == 0) {
       return;
     }
 
-    this->data.insert(this->data.begin() + ppos, data, data + size);
+    this->data.insert(this->data.begin() + ppos, data,
+                      data + static_cast<int32_t>(size));
 
-    ppos += size;
+    ppos += static_cast<int32_t>(size);
   } catch (...) {
     throw std::runtime_error("Failed to write data to internal storage.");
   }
@@ -51,14 +52,15 @@ void BinaryArchive::SetReadPosition(int32_t pos, SeekDirection seekDir) {
         "Failed to set new reading position: storage is empty.");
   }
 
-  auto newPosition = calculateNewPosition(pos, SeekType::READ, seekDir);
+  auto newPosition = static_cast<std::size_t>(
+      calculateNewPosition(pos, SeekType::READ, seekDir));
 
-  if (newPosition < 0 || newPosition >= static_cast<int32_t>(storageSize)) {
+  if (newPosition < 0 || newPosition >= storageSize) {
     throw std::runtime_error(
         "Failed to set new reading position: out of bounds.");
   }
 
-  gpos = newPosition;
+  gpos = static_cast<int32_t>(newPosition);
 }
 
 int32_t BinaryArchive::GetWritePosition(SeekDirection seekDir) const {
@@ -73,14 +75,15 @@ void BinaryArchive::SetWritePosition(int32_t pos, SeekDirection seekDir) {
         "Failed to set new writing position: storage is empty.");
   }
 
-  auto newPosition = calculateNewPosition(pos, SeekType::WRITE, seekDir);
+  auto newPosition = static_cast<std::size_t>(
+      calculateNewPosition(pos, SeekType::WRITE, seekDir));
 
-  if (newPosition < 0 || newPosition >= static_cast<int32_t>(storageSize)) {
+  if (newPosition < 0 || newPosition >= storageSize) {
     throw std::runtime_error(
         "Failed to set new writing position: out of bounds.");
   }
 
-  ppos = newPosition;
+  ppos = static_cast<int32_t>(newPosition);
 }
 
 void BinaryArchive::Clear() {
@@ -94,7 +97,7 @@ void BinaryArchive::Clear() {
   ppos = -1;
 }
 
-size_t BinaryArchive::GetSize() const { return data.size(); }
+std::size_t BinaryArchive::GetSize() const { return data.size(); }
 
 const unsigned char* BinaryArchive::GetDataPointer() const {
   return data.data();
