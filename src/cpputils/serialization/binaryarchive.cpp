@@ -1,6 +1,6 @@
 #include "binaryarchive.h"
 
-BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(-1), gpos(-1) {
+BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(0), gpos(0) {
   data.reserve(capacity);
 }
 
@@ -10,13 +10,11 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
       return;
     }
 
-    auto currentPosition = gpos == -1 ? 0 : gpos;
-
-    if (static_cast<std::size_t>(currentPosition) + size > this->data.size()) {
+    if (static_cast<std::size_t>(gpos) + size > this->data.size()) {
       throw std::runtime_error("Reading position out of bound.");
     }
 
-    auto beginPosition = this->data.begin() + currentPosition;
+    auto beginPosition = this->data.begin() + gpos;
     auto endPosition = beginPosition + static_cast<int32_t>(size);
 
     std::copy(beginPosition, endPosition, data);
@@ -33,9 +31,7 @@ void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
       return;
     }
 
-    auto currentPosition = ppos == -1 ? 0 : ppos;
-
-    this->data.insert(this->data.begin() + currentPosition, data,
+    this->data.insert(this->data.begin() + ppos, data,
                       data + static_cast<int32_t>(size));
 
     ppos += static_cast<int32_t>(size);
@@ -97,8 +93,8 @@ void BinaryArchive::Clear() {
     throw std::runtime_error("Failed to clear internal storage.");
   }
 
-  gpos = -1;
-  ppos = -1;
+  gpos = 0;
+  ppos = 0;
 }
 
 std::size_t BinaryArchive::GetSize() const { return data.size(); }
@@ -134,12 +130,12 @@ int32_t BinaryArchive::calculateNewPosition(int32_t pos, SeekType seekType,
 int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
                                                 SeekDirection seekDir) const {
   auto storageSize = data.size();
-  auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);
 
   if (storageSize == 0) {
-    return currentPosition;
+    return UNDEFINED_POSITION;
   }
 
+  auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);
   auto calculatedPosition = 0;
 
   switch (seekDir) {

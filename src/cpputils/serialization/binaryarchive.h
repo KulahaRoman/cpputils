@@ -3,6 +3,7 @@
 #include <vector>
 
 constexpr std::size_t INITIAL_CAPACITY = 128ull;
+constexpr int32_t UNDEFINED_POSITION = -1;
 
 class BinaryArchive {
  public:
