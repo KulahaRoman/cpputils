@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <bit>
 #include <list>
 #include <map>
 #include <memory>
@@ -19,11 +20,12 @@ class Serializer {
   static void Serialize(const T value, BinaryArchive& archive) {
     try {
       // let's assume that network endian is big
-      T temp = value;
+      T temp = 0;
+
       if constexpr (std::endian::native == std::endian::little) {
-        char *istart = reinterpret_cast<char*>(&temp),
-             *iend = istart + sizeof(temp);
-        std::reverse(istart, iend);
+        temp = swapBytes(value);
+      } else {
+        temp = value;
       }
 
       archive.Write(reinterpret_cast<const unsigned char*>(&temp),
@@ -146,13 +148,10 @@ class Serializer {
 
       // let's assume that network endian is big
       if constexpr (std::endian::native == std::endian::little) {
-        char *istart = reinterpret_cast<char*>(&temp),
-             *iend = istart + sizeof(temp);
-        std::reverse(istart, iend);
+        value = swapBytes(temp);
+      } else {
+        value = temp;
       }
-
-      value = temp;
-
     } catch (...) {
       throw std::runtime_error("Failed to deserialize integral type value.");
     }
@@ -293,5 +292,15 @@ class Serializer {
 
   static void Deserialize(Serializable& obj, BinaryArchive& archive) {
     obj.Deserialize(archive);
+  }
+
+ private:
+  template <class T, class Enable = typename std::enable_if<
+                         std::is_integral<T>::value>::type>
+  static T swapBytes(T value) noexcept {
+    auto value_representation =
+        std::bit_cast<std::array<std::byte, sizeof(T)>>(value);
+    std::ranges::reverse(value_representation);
+    return std::bit_cast<T>(value_representation);
   }
 };
