@@ -18,8 +18,14 @@ class Serializer {
                          std::is_integral<T>::value>::type>
   static void Serialize(const T value, BinaryArchive& archive) {
     try {
-      archive.Write(reinterpret_cast<const unsigned char*>(&value),
-                    sizeof(value));
+      // let's assume that network endian is big
+      T temp = value;
+      if constexpr (std::endian::native == std::endian::little) {
+        std::reverse(&temp, &temp + sizeof(temp));
+      }
+
+      archive.Write(reinterpret_cast<const unsigned char*>(&temp),
+                    sizeof(temp));
     } catch (...) {
       throw std::runtime_error("Failed to serialize integral type value.");
     }
@@ -132,7 +138,17 @@ class Serializer {
                          std::is_integral<T>::value>::type>
   static void Deserialize(T& value, BinaryArchive& archive) {
     try {
-      archive.Read(reinterpret_cast<unsigned char*>(&value), sizeof(value));
+      T temp = 0;
+
+      archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
+
+      // let's assume that network endian is big
+      if constexpr (std::endian::native == std::endian::little) {
+        std::reverse(&temp, &temp + sizeof(temp));
+      }
+
+      value = temp;
+
     } catch (...) {
       throw std::runtime_error("Failed to deserialize integral type value.");
     }
@@ -274,4 +290,9 @@ class Serializer {
   static void Deserialize(Serializable& obj, BinaryArchive& archive) {
     obj.Deserialize(archive);
   }
+
+ private:
+  template <class T, class Enable = typename std::enable_if<
+                         std::is_integral<T>::value>::type>
+  T serializeWithEndianness(const T& value) {}
 };
