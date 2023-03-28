@@ -298,9 +298,12 @@ class Serializer {
   template <class T, class Enable = typename std::enable_if<
                          std::is_integral<T>::value>::type>
   static T swapBytes(T value) noexcept {
-    auto value_representation =
-        std::bit_cast<std::array<std::byte, sizeof(T)>>(value);
-    std::ranges::reverse(value_representation);
-    return std::bit_cast<T>(value_representation);
+    T temp = value;
+
+    char *istart = reinterpret_cast<char*>(&temp),
+         *iend = istart + sizeof(temp);
+    std::reverse(istart, iend);
+
+    return temp;
   }
 };
