@@ -5,7 +5,7 @@ project(cpputils)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCES # Files
+set(CPPUTILS_SRC # Files
 			src/cpputils/files/files.cpp
 			
 			# Logger
@@ -30,9 +30,9 @@ set(SOURCES # Files
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
 
 add_subdirectory(libs/spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
