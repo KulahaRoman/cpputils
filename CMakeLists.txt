@@ -30,9 +30,11 @@ set(CPPUTILS_SRC # Files
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
+if(NOT TARGET ${PROJECT_NAME})
+  add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
 
-add_subdirectory(libs/spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+  add_subdirectory(libs/spdlog)
+  target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+  target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+endif()
