@@ -1,4 +1,4 @@
-#include "SHA256.h"
+#include "sha256.h"
 
 #include <cstring>
 #include <iomanip>
