@@ -19,6 +19,7 @@ class Logger {
 
     if (LOG_TO_FILE) {
       getInstance().file->info(fmt, std::forward<Args>(args)...);
+      getInstance().file->flush();
     }
   }
 
@@ -28,6 +29,7 @@ class Logger {
 
     if (LOG_TO_FILE) {
       getInstance().file->warn(fmt, std::forward<Args>(args)...);
+      getInstance().file->flush();
     }
   }
 
@@ -37,6 +39,7 @@ class Logger {
 
     if (LOG_TO_FILE) {
       getInstance().file->error(fmt, std::forward<Args>(args)...);
+      getInstance().file->flush();
     }
   }
 
@@ -46,6 +49,7 @@ class Logger {
 
     if (LOG_TO_FILE) {
       getInstance().file->critical(fmt, std::forward<Args>(args)...);
+      getInstance().file->flush();
     }
   }
 
