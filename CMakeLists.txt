@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.8)
 
 project(cpputils)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 set(CPPUTILS_SRC # Files
 			src/cpputils/files/files.cpp
@@ -30,11 +31,15 @@ set(CPPUTILS_SRC # Files
 			src/cpputils/synchronizers/countdownlatch/countdownlatch.cpp
 )
 
+enable_testing()
+
 if(NOT TARGET ${PROJECT_NAME})
   add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
 
   add_subdirectory(libs/spdlog)
   target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+
+  add_subdirectory(test)
 
   target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 endif()

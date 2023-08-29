@@ -1,6 +1,5 @@
 #pragma once
 #include <algorithm>
-#include <bit>
 #include <list>
 #include <map>
 #include <memory>
@@ -11,6 +10,7 @@
 #include <vector>
 
 #include "binaryarchive.h"
+#include "endianness.h"
 #include "serializable.h"
 
 class Serializer {
@@ -22,7 +22,7 @@ class Serializer {
       // let's assume that network endian is big
       T temp = 0;
 
-      if constexpr (std::endian::native == std::endian::little) {
+      if (GetSystemEndianness() == Endianness::LITTLE) {
         temp = swapBytes(value);
       } else {
         temp = value;
@@ -147,7 +147,7 @@ class Serializer {
       archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
 
       // let's assume that network endian is big
-      if constexpr (std::endian::native == std::endian::little) {
+      if (GetSystemEndianness() == Endianness::LITTLE) {
         value = swapBytes(temp);
       } else {
         value = temp;
