@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "../abstract/abstractencryptor.h"
+#include "abstractencryptor.h"
 #include "aes.h"
 
 constexpr uint64_t BLOCK_SIZE = 16ull;

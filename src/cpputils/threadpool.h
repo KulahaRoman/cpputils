@@ -7,7 +7,7 @@
 #include <thread>
 #include <vector>
 
-#include "../logger/logger.h"
+#include "logger.h"
 
 using Task = std::function<void()>;
 

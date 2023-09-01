@@ -6,6 +6,8 @@ CMakeSettings.json
 
 build
 out
+bin
+lib
 
 # Prerequisites
 *.d

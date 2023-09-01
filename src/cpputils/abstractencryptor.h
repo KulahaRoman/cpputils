@@ -1,7 +1,7 @@
 #pragma once
 #include <stdexcept>
 
-#include "../encryptor.h"
+#include "encryptor.h"
 
 class AbstractEncryptor : public Encryptor {
  public:

@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <vector>
 
-constexpr std::size_t INITIAL_CAPACITY = 128ull;
+constexpr std::size_t INITIAL_CAPACITY = 1024ull;
 constexpr int32_t UNDEFINED_POSITION = -1;
 
 class BinaryArchive {
