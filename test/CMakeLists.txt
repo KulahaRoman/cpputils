@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 project(cpputils-test)
 
 set(CPPUTILS_TEST_SRC	main.cpp
-						src/cpputils_test.cpp
+						src/binaryarchivetest.cpp
 )
 
 add_executable(${PROJECT_NAME} ${CPPUTILS_TEST_SRC})
