@@ -8,4 +8,7 @@ class BinaryArchiveTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
-TEST_F(BinaryArchiveTest, SomeShit) { ASSERT_EQ(1, 1); }
+TEST_F(BinaryArchiveTest, SomeShit) {
+  BinaryArchive archive;
+  ASSERT_EQ(1, 1);
+}
