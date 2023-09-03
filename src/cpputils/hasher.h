@@ -7,5 +7,5 @@ class Hasher {
   virtual std::vector<unsigned char> Hash(
       const std::vector<unsigned char>& data) const = 0;
 
-  ~Hasher() {}
+  virtual ~Hasher() {}
 };
