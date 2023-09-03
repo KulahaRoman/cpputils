@@ -9,6 +9,7 @@
 #undef CopyFile
 #endif
 
+namespace CppUtils {
 namespace fs = std::filesystem;
 
 class Files {
@@ -20,3 +21,4 @@ class Files {
   static bool Exists(const fs::path& path);
   static uint64_t GetSize(const fs::path& path);
 };
+}  // namespace CppUtils

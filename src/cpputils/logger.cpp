@@ -1,5 +1,6 @@
 #include "logger.h"
 
+namespace CppUtils {
 Logger::Logger()
     : console(spdlog::stdout_color_mt(LOGGER_CONSOLE)),
       file(spdlog::basic_logger_mt(LOGGER_FILE, LOGFILE)) {
@@ -8,3 +9,4 @@ Logger::Logger()
   spdlog::get(LOGGER_FILE)
       ->set_pattern("[%H:%M:%S %z][TH %t][%^---%L---%$]: %v");
 }
+}  // namespace CppUtils

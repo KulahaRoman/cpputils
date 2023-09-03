@@ -9,6 +9,6 @@ class BinaryArchiveTest : public ::testing::Test {
 };
 
 TEST_F(BinaryArchiveTest, SomeShit) {
-  BinaryArchive archive;
+  CppUtils::BinaryArchive archive;
   ASSERT_EQ(1, 1);
 }

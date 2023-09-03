@@ -3,6 +3,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+namespace CppUtils {
 constexpr bool LOG_TO_FILE = true;
 
 constexpr char LOGFILE[] = "logs.txt";
@@ -63,3 +64,4 @@ class Logger {
   std::shared_ptr<spdlog::logger> console;
   std::shared_ptr<spdlog::logger> file;
 };
+}  // namespace CppUtils

@@ -9,6 +9,7 @@
 
 #include "logger.h"
 
+namespace CppUtils {
 using Task = std::function<void()>;
 
 constexpr auto MIN_THREADS_NUMBER = 4u;
@@ -102,3 +103,4 @@ class ThreadPool {
   std::mutex mx;
   std::condition_variable cv;
 };
+}  // namespace CppUtils

@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 
+namespace CppUtils {
 constexpr std::size_t INITIAL_CAPACITY = 1024ull;
 constexpr int32_t UNDEFINED_POSITION = -1;
 
@@ -86,3 +87,4 @@ class BinaryArchive {
   // Reading position.
   int32_t gpos;
 };
+}  // namespace CppUtils

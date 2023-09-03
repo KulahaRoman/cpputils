@@ -1,5 +1,6 @@
 #include "abstractencryptor.h"
 
+namespace CppUtils {
 AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
                                      const std::vector<unsigned char>& key)
     : blockSize(blockSize), keySize(keySize), key(key) {
@@ -11,3 +12,4 @@ AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
 uint64_t AbstractEncryptor::GetBlockSize() const { return blockSize; }
 
 uint64_t AbstractEncryptor::GetKeySize() const { return keySize; }
+}  // namespace CppUtils

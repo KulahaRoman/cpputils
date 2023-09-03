@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+namespace CppUtils {
 class Hasher {
  public:
   virtual std::vector<unsigned char> Hash(
@@ -9,3 +10,4 @@ class Hasher {
 
   virtual ~Hasher() {}
 };
+}  // namespace CppUtils

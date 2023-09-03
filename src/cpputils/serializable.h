@@ -1,6 +1,7 @@
 #pragma once
 #include "binaryarchive.h"
 
+namespace CppUtils {
 class Serializable {
  public:
   virtual void Serialize(BinaryArchive& archive) const = 0;
@@ -8,3 +9,4 @@ class Serializable {
 
   virtual ~Serializable() {}
 };
+}  // namespace CppUtils

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 
+namespace CppUtils {
 class Encryptor {
  public:
   virtual std::vector<unsigned char> Encrypt(
@@ -13,3 +14,5 @@ class Encryptor {
 
   virtual ~Encryptor() {}
 };
+
+}  // namespace CppUtils

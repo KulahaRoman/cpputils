@@ -1,5 +1,6 @@
 #pragma once
 
+namespace CppUtils {
 enum class Endianness {
   LITTLE = 0,
   BIG = 1,
@@ -13,3 +14,5 @@ Endianness GetSystemEndianness() {
 
   return (*leastSignificantAddress == 0x01) ? Endianness::LITTLE
                                             : Endianness::BIG;
+}
+}  // namespace CppUtils

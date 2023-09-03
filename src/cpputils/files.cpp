@@ -1,5 +1,6 @@
 #include "files.h"
 
+namespace CppUtils {
 void Files::CreateFile(const fs::path& path) {
   std::ofstream fout;
   fout.exceptions(std::ios_base::badbit | std::ios_base::failbit);
@@ -65,3 +66,4 @@ uint64_t Files::GetSize(const fs::path& path) {
   }
   return 0;
 }
+}  // namespace CppUtils

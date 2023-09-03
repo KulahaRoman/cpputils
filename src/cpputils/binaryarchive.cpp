@@ -1,5 +1,6 @@
 #include "binaryarchive.h"
 
+namespace CppUtils {
 BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(0), gpos(0) {
   data.reserve(capacity);
 }
@@ -155,3 +156,4 @@ int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
 
   return calculatedPosition;
 }
+}  // namespace CppUtils

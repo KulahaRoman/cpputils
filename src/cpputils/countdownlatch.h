@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <mutex>
 
+namespace CppUtils {
 class CountDownLatch {
  public:
   CountDownLatch(uint64_t size);
@@ -18,3 +19,4 @@ class CountDownLatch {
   std::mutex mx;
   std::condition_variable cv;
 };
+}  // namespace CppUtils

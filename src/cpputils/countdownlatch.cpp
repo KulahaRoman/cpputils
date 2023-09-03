@@ -1,5 +1,6 @@
 #include "countdownlatch.h"
 
+namespace CppUtils {
 CountDownLatch::CountDownLatch(uint64_t size) : size(size), completed(0ull) {}
 
 void CountDownLatch::Await() {
@@ -19,3 +20,4 @@ void CountDownLatch::Reset() {
   auto lock = std::unique_lock<std::mutex>(mx);
   completed = 0;
 }
+}  // namespace CppUtils

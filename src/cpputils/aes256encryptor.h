@@ -4,6 +4,7 @@
 #include "abstractencryptor.h"
 #include "aes.h"
 
+namespace CppUtils {
 constexpr uint64_t BLOCK_SIZE = 16ull;
 constexpr uint64_t KEY_SIZE = 32ull;
 
@@ -19,3 +20,4 @@ class AES256Encryptor : public AbstractEncryptor {
  private:
   AES aes;
 };
+}  // namespace CppUtils

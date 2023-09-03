@@ -13,6 +13,7 @@
 #include "endianness.h"
 #include "serializable.h"
 
+namespace CppUtils {
 class Serializer {
  public:
   template <class T, class Enable = typename std::enable_if<
@@ -307,3 +308,4 @@ class Serializer {
     return temp;
   }
 };
+}  // namespace CppUtils
