@@ -16,9 +16,26 @@ set(CPPUTILS_SRC
 			cpputils/countdownlatch.cpp
 )
 
+set(CPPUTILS_HEADERS 
+			cpputils/encryptor.h			
+			cpputils/abstractencryptor.h
+			cpputils/aes256encryptor.h
+			cpputils/binaryarchive.h
+			cpputils/countdownlatch.h
+			cpputils/logger.h
+			cpputils/files.h
+			cpputils/hasher.h
+			cpputils/md5hasher.h
+			cpputils/sha256hasher.h
+			cpputils/serializable.h
+			cpputils/serializer.h
+			cpputils/threadpool.h
+)
+
 add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+install(FILES ${CPPUTILS_HEADERS} DESTINATION ${CPPUTILS_INSTALL_INCLUDE})
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CPPUTILS_INSTALL_LIB})

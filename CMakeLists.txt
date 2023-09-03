@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CPPUTILS_INSTALL_BIN ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(CPPUTILS_INSTALL_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(CPPUTILS_INSTALL_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(libs/spdlog)
 add_subdirectory(libs/gtest)
