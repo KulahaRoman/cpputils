@@ -32,8 +32,13 @@ void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
       return;
     }
 
-    this->data.insert(this->data.begin() + ppos, data,
-                      data + static_cast<int32_t>(size));
+    auto newSize = ppos + size;
+    if (newSize > this->data.size()) {
+      this->data.resize(newSize);
+    }
+
+    std::copy(data, data + static_cast<int32_t>(size),
+              this->data.data() + ppos);
 
     ppos += static_cast<int32_t>(size);
   } catch (...) {
@@ -116,7 +121,7 @@ int32_t BinaryArchive::calculateNewPosition(int32_t pos, SeekType seekType,
       break;
     }
     case SeekDirection::END: {
-      calculatedPosition = static_cast<int>(storageSize - 1 - pos);
+      calculatedPosition = static_cast<int>(storageSize - pos);
       break;
     }
     case SeekDirection::RELATIVE: {
@@ -145,7 +150,7 @@ int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
       break;
     }
     case SeekDirection::END: {
-      calculatedPosition = static_cast<int>(storageSize - 1 - currentPosition);
+      calculatedPosition = static_cast<int>(storageSize - currentPosition);
       break;
     }
     case SeekDirection::RELATIVE: {
