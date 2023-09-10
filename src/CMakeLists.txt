@@ -14,19 +14,21 @@ set(CPPUTILS_SRC
 			cpputils/sha256.cpp
 			cpputils/binaryarchive.cpp
 			cpputils/countdownlatch.cpp
+			cpputils/serializer.cpp
+			cpputils/endiannessprovider.cpp
 )
 
 set(CPPUTILS_HEADERS 
 			cpputils/encryptor.h			
 			cpputils/abstractencryptor.h
 			cpputils/aes256encryptor.h
-			cpputils/binaryarchive.h
 			cpputils/countdownlatch.h
 			cpputils/logger.h
 			cpputils/files.h
 			cpputils/hasher.h
 			cpputils/md5hasher.h
 			cpputils/sha256hasher.h
+			cpputils/binaryarchive.h
 			cpputils/serializable.h
 			cpputils/serializer.h
 			cpputils/threadpool.h

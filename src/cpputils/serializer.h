@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "binaryarchive.h"
-#include "endianness.h"
+#include "endiannessprovider.h"
 #include "serializable.h"
 
 namespace CppUtils {
@@ -23,7 +23,8 @@ class Serializer {
       // let's assume that network endian is big
       T temp = 0;
 
-      if (GetSystemEndianness() == Endianness::LITTLE) {
+      if (EndiannessProvider::GetSystemEndianness() ==
+          EndiannessProvider::Endianness::LITTLE) {
         temp = swapBytes(value);
       } else {
         temp = value;
@@ -131,12 +132,36 @@ class Serializer {
       throw std::runtime_error(
           "Failed to serialize std::shared_ptr<T>: pointer is null.");
     }
-
     Serialize(*obj, archive);
   }
 
   static void Serialize(const Serializable& obj, BinaryArchive& archive) {
-    obj.Serialize(archive);
+    // If serializable object 'obj' was not serialized earlier,
+    // put it into reference map and increment 'objectCount', then actually
+    // serialize.
+    if (!referenceMap.count(&obj)) {
+      referenceMap.emplace(&obj, objectCount);
+
+      Serialize(objectCount++, archive);
+
+      auto serialUID = obj.GetSerialUID();
+      Serialize(serialUID, archive);
+
+      obj.Serialize(archive);
+    } else {
+      auto index = referenceMap[&obj];
+      Serialize(index, archive);
+    }
+
+    // The end of serializable objects tree, clear reference map and object
+    // counter.
+    if (referenceMap.count(&obj)) {
+      auto index = referenceMap[&obj];
+      if (index == 0) {
+        objectCount = 0;
+        referenceMap.clear();
+      }
+    }
   }
 
   template <class T, class Enable = typename std::enable_if<
@@ -148,7 +173,8 @@ class Serializer {
       archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
 
       // let's assume that network endian is big
-      if (GetSystemEndianness() == Endianness::LITTLE) {
+      if (EndiannessProvider::GetSystemEndianness() ==
+          EndiannessProvider::Endianness::LITTLE) {
         value = swapBytes(temp);
       } else {
         value = temp;
@@ -292,7 +318,35 @@ class Serializer {
   }
 
   static void Deserialize(Serializable& obj, BinaryArchive& archive) {
-    obj.Deserialize(archive);
+    // Read reference index of serializable object.
+    auto index = UNDEFINED_REFERENCE_INDEX;
+    Deserialize(index, archive);
+
+    // If there is no object with such reference index in reference map,
+    // deserialize it and put into reference map.
+    if (!reverseReferenceMap.count(index)) {
+      // Read & check unique serial ID.
+      auto serialUID = UNDEFINED_OBJECT_UNIQUE_ID;
+      Deserialize(serialUID, archive);
+
+      if (serialUID != obj.GetSerialUID()) {
+        throw std::runtime_error(
+            "Failed to deserialize object (wrong UID or corrupted data).");
+      }
+
+      reverseReferenceMap.emplace(index, &obj);
+      obj.Deserialize(archive);
+    } else {
+      // If there is already an object with such reference index, don't
+      // deserialize it again, just assign a copy of an previously deserialized
+      // object via copy assignment operator.
+      obj = *reverseReferenceMap[index];
+    }
+
+    // The end of object tree, clearing reference map.
+    if (index == 0) {
+      reverseReferenceMap.clear();
+    }
   }
 
  private:
@@ -307,5 +361,18 @@ class Serializer {
 
     return temp;
   }
+
+  // Private const definitions.
+  static const int UNDEFINED_REFERENCE_INDEX;
+  static const int UNDEFINED_OBJECT_UNIQUE_ID;
+
+  // Thread-local reference maps and object counter.
+
+  // Used for serialization.
+  static thread_local int objectCount;
+  // Used for serialization.
+  static thread_local std::map<const Serializable*, int> referenceMap;
+  // Used for deserialization.
+  static thread_local std::map<int, const Serializable*> reverseReferenceMap;
 };
 }  // namespace CppUtils

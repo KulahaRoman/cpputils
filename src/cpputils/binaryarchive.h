@@ -3,9 +3,6 @@
 #include <vector>
 
 namespace CppUtils {
-constexpr std::size_t INITIAL_CAPACITY = 1024ull;
-constexpr int32_t UNDEFINED_POSITION = -1;
-
 class BinaryArchive {
  public:
 #ifdef BEGIN
@@ -78,6 +75,10 @@ class BinaryArchive {
                                    SeekDirection seekDir) const;
 
  private:
+  // Private const definitions.
+  static const std::size_t INITIAL_CAPACITY;
+  static const int32_t UNDEFINED_POSITION;
+
   // Internal storage.
   std::vector<unsigned char> data;
 

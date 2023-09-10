@@ -1,12 +1,7 @@
-#pragma once
+#include "endiannessprovider.h"
 
 namespace CppUtils {
-enum class Endianness {
-  LITTLE = 0,
-  BIG = 1,
-};
-
-Endianness GetSystemEndianness() {
+EndiannessProvider::Endianness EndiannessProvider::GetSystemEndianness() {
   const int value{0x01};
   const void* address{static_cast<const void*>(&value)};
   const unsigned char* leastSignificantAddress{

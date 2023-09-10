@@ -1,6 +1,9 @@
 #include "binaryarchive.h"
 
 namespace CppUtils {
+const std::size_t BinaryArchive::INITIAL_CAPACITY = 1024ull;
+const int32_t BinaryArchive::UNDEFINED_POSITION = -1;
+
 BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(0), gpos(0) {
   data.reserve(capacity);
 }

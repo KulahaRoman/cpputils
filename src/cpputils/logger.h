@@ -4,12 +4,6 @@
 #include <spdlog/spdlog.h>
 
 namespace CppUtils {
-constexpr bool LOG_TO_FILE = true;
-
-constexpr char LOGFILE[] = "logs.txt";
-constexpr char LOGGER_CONSOLE[] = "console";
-constexpr char LOGGER_FILE[] = "file";
-
 class Logger {
  public:
   Logger();
@@ -61,6 +55,12 @@ class Logger {
   }
 
  private:
+  // Private const definitions.
+  static const bool LOG_TO_FILE;
+  static const char LOGFILE[];
+  static const char LOGGER_CONSOLE[];
+  static const char LOGGER_FILE[];
+
   std::shared_ptr<spdlog::logger> console;
   std::shared_ptr<spdlog::logger> file;
 };
