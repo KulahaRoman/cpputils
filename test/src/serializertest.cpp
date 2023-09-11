@@ -3,13 +3,13 @@
 #include <cpputils/serializer.h>
 #include <gtest/gtest.h>
 
-//              A
-//              |
-//              B
-//             / \
-//            C   D
-//            |   |
-//            E<--F
+//              A>----.
+//              |     |
+//              B     |
+//             / \    |
+//            C   D   |
+//            |   |   |
+//            E-<-F-<-.
 //
 
 class E : public CppUtils::Serializable {
@@ -175,16 +175,21 @@ class B : public CppUtils::Serializable {
 class A : public CppUtils::Serializable {
  public:
   A() {}
-  A(const std::shared_ptr<B>& b) : b(b) {}
+  A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {}
 
   void SetB(const std::shared_ptr<B>& b) { this->b = b; }
   std::shared_ptr<B> GetB() const { return b; }
 
+  void SetF(const std::shared_ptr<F>& f) { this->f = f; }
+  std::shared_ptr<F> GetF() const { return f; }
+
   virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
     CppUtils::Serializer::Serialize(b, archive);
+    CppUtils::Serializer::Serialize(f, archive);
   }
   virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
     CppUtils::Serializer::Deserialize(b, archive);
+    CppUtils::Serializer::Deserialize(f, archive);
   }
 
   virtual int GetSerialUID() const override { return 7; }
@@ -192,11 +197,13 @@ class A : public CppUtils::Serializable {
   Serializable& operator=(const Serializable& other) override {
     auto& ref = static_cast<const A&>(other);
     b = ref.b;
+    f = ref.f;
     return *this;
   }
 
  private:
   std::shared_ptr<B> b;
+  std::shared_ptr<F> f;
 };
 
 TEST(SerializerTest, Test) {
@@ -208,7 +215,7 @@ TEST(SerializerTest, Test) {
 
   auto b = std::make_shared<B>(c, d);
 
-  auto aOut = std::make_shared<A>(b);
+  auto aOut = std::make_shared<A>(b, f);
 
   CppUtils::BinaryArchive archive;
   CppUtils::Serializer::Serialize(aOut, archive);
