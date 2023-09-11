@@ -14,6 +14,12 @@
 #include "serializable.h"
 
 namespace CppUtils {
+// Represents a singletone class that does mostly all job of serialization.
+// Currently supports integral types, STL strings, several containers and
+// custom Serializable class. Detects and prevents cyclic references like Java
+// does. Checks system endianness in runtime so it's fine to use this serializer
+// to exchange some data between Linux and Windows apps.
+
 class Serializer {
  public:
   template <class T, class Enable = typename std::enable_if<
@@ -135,12 +141,18 @@ class Serializer {
     Serialize(*obj, archive);
   }
 
-  static void Serialize(const Serializable& obj, BinaryArchive& archive) {
+  template <class T, class Enable = typename std::enable_if<
+                         std::is_base_of<Serializable<T>, T>::value>::type>
+  static void Serialize(const T& obj, BinaryArchive& archive) {
     // If serializable object 'obj' was not serialized earlier,
     // put it into reference map and increment 'objectCount', then actually
     // serialize.
-    if (!referenceMap.count(&obj)) {
-      referenceMap.emplace(&obj, objectCount);
+
+    // Let's fuck compiler with it's templates.
+    auto objectRawPointer = static_cast<const void*>(&obj);
+
+    if (!referenceMap.count(objectRawPointer)) {
+      referenceMap.emplace(objectRawPointer, objectCount);
 
       Serialize(objectCount++, archive);
 
@@ -149,14 +161,14 @@ class Serializer {
 
       obj.Serialize(archive);
     } else {
-      auto index = referenceMap[&obj];
+      auto index = referenceMap[objectRawPointer];
       Serialize(index, archive);
     }
 
     // The end of serializable objects tree, clear reference map and object
     // counter.
-    if (referenceMap.count(&obj)) {
-      auto index = referenceMap[&obj];
+    if (referenceMap.count(objectRawPointer)) {
+      auto index = referenceMap[objectRawPointer];
       if (index == 0) {
         objectCount = 0;
         referenceMap.clear();
@@ -317,7 +329,13 @@ class Serializer {
     Deserialize(*obj, archive);
   }
 
-  static void Deserialize(Serializable& obj, BinaryArchive& archive) {
+  // I was used to add third dummy parameter because there is already method
+  // with same signature (integral types deserializer).
+  template <class T>
+  static void Deserialize(
+      T& obj, BinaryArchive& archive,
+      typename std::enable_if<
+          std::is_base_of<Serializable<T>, T>::value>::type* = nullptr) {
     // Read reference index of serializable object.
     auto index = UNDEFINED_REFERENCE_INDEX;
     Deserialize(index, archive);
@@ -334,13 +352,15 @@ class Serializer {
             "Failed to deserialize object (wrong UID or corrupted data).");
       }
 
-      reverseReferenceMap.emplace(index, &obj);
+      auto objectRawPointer = static_cast<const void*>(&obj);
+
+      reverseReferenceMap.emplace(index, objectRawPointer);
       obj.Deserialize(archive);
     } else {
       // If there is already an object with such reference index, don't
       // deserialize it again, just assign a copy of an previously deserialized
       // object via copy assignment operator.
-      obj = *reverseReferenceMap[index];
+      obj = *static_cast<const T*>(reverseReferenceMap[index]);
     }
 
     // The end of object tree, clearing reference map.
@@ -371,8 +391,8 @@ class Serializer {
   // Used for serialization.
   static thread_local int objectCount;
   // Used for serialization.
-  static thread_local std::map<const Serializable*, int> referenceMap;
+  static thread_local std::map<const void*, int> referenceMap;
   // Used for deserialization.
-  static thread_local std::map<int, const Serializable*> reverseReferenceMap;
+  static thread_local std::map<int, const void*> reverseReferenceMap;
 };
 }  // namespace CppUtils

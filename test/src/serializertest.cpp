@@ -12,7 +12,7 @@
 //            E-<-F-<-.
 //
 
-class E : public CppUtils::Serializable {
+class E : public CppUtils::Serializable<E> {
  public:
   E() : num(0) {}
   E(int num) : num(num) {}
@@ -30,9 +30,8 @@ class E : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 412; }
 
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const E&>(other);
-    num = ref.num;
+  E& operator=(const E& other) override {
+    num = other.num;
     return *this;
   }
 
@@ -40,7 +39,7 @@ class E : public CppUtils::Serializable {
   int num;
 };
 
-class F : public CppUtils::Serializable {
+class F : public CppUtils::Serializable<F> {
  public:
   F() : num(0) {}
   F(int num, const std::shared_ptr<E>& e) : num(num), e(e) {}
@@ -63,16 +62,9 @@ class F : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 21412; }
 
-  F& operator=(const F& other) {
+  F& operator=(const F& other) override {
     num = other.num;
     e = other.e;
-    return *this;
-  }
-
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const F&>(other);
-    num = ref.num;
-    e = ref.e;
     return *this;
   }
 
@@ -81,7 +73,7 @@ class F : public CppUtils::Serializable {
   std::shared_ptr<E> e;
 };
 
-class D : public CppUtils::Serializable {
+class D : public CppUtils::Serializable<D> {
  public:
   D() {}
   D(const std::shared_ptr<F>& f) : f(f) {}
@@ -99,9 +91,8 @@ class D : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 214; }
 
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const D&>(other);
-    f = ref.f;
+  D& operator=(const D& other) override {
+    f = other.f;
     return *this;
   }
 
@@ -109,7 +100,7 @@ class D : public CppUtils::Serializable {
   std::shared_ptr<F> f;
 };
 
-class C : public CppUtils::Serializable {
+class C : public CppUtils::Serializable<C> {
  public:
   C() {}
   C(const std::shared_ptr<E>& e) : e(e) {}
@@ -127,9 +118,8 @@ class C : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 14; }
 
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const C&>(other);
-    e = ref.e;
+  C& operator=(const C& other) override {
+    e = other.e;
     return *this;
   }
 
@@ -137,7 +127,7 @@ class C : public CppUtils::Serializable {
   std::shared_ptr<E> e;
 };
 
-class B : public CppUtils::Serializable {
+class B : public CppUtils::Serializable<B> {
  public:
   B() {}
   B(const std::shared_ptr<C>& c, const std::shared_ptr<D>& d) : c(c), d(d) {}
@@ -160,10 +150,9 @@ class B : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 2547; }
 
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const B&>(other);
-    c = ref.c;
-    d = ref.d;
+  B& operator=(const B& other) override {
+    c = other.c;
+    d = other.d;
     return *this;
   }
 
@@ -172,7 +161,7 @@ class B : public CppUtils::Serializable {
   std::shared_ptr<D> d;
 };
 
-class A : public CppUtils::Serializable {
+class A : public CppUtils::Serializable<A> {
  public:
   A() {}
   A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {}
@@ -194,10 +183,9 @@ class A : public CppUtils::Serializable {
 
   virtual int GetSerialUID() const override { return 7; }
 
-  Serializable& operator=(const Serializable& other) override {
-    auto& ref = static_cast<const A&>(other);
-    b = ref.b;
-    f = ref.f;
+  A& operator=(const A& other) override {
+    b = other.b;
+    f = other.f;
     return *this;
   }
 
@@ -221,6 +209,9 @@ TEST(SerializerTest, Test) {
   CppUtils::Serializer::Serialize(aOut, archive);
 
   auto aIn = std::shared_ptr<A>();
+  CppUtils::Serializer::Deserialize(aIn, archive);
+
+  CppUtils::Serializer::Serialize(aOut, archive);
   CppUtils::Serializer::Deserialize(aIn, archive);
 
   ASSERT_EQ(aIn->GetB()->GetC()->GetE()->GetNumber(), e->GetNumber());
