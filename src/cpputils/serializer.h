@@ -134,11 +134,12 @@ class Serializer {
 
   template <class T>
   static void Serialize(const std::shared_ptr<T>& obj, BinaryArchive& archive) {
-    if (!obj) {
-      throw std::runtime_error(
-          "Failed to serialize std::shared_ptr<T>: pointer is null.");
+    auto pointerState = !!obj ? PointerState::CORRECT : PointerState::INCORRECT;
+    Serialize(reinterpret_cast<int&>(pointerState), archive);
+
+    if (pointerState == PointerState::CORRECT) {
+      Serialize(*obj, archive);
     }
-    Serialize(*obj, archive);
   }
 
   template <class T, class Enable = typename std::enable_if<
@@ -322,11 +323,13 @@ class Serializer {
 
   template <class T>
   static void Deserialize(std::shared_ptr<T>& obj, BinaryArchive& archive) {
-    if (!obj) {
-      obj = std::make_shared<T>();
-    }
+    auto pointerState = PointerState::NONE;
+    Deserialize(reinterpret_cast<int&>(pointerState), archive);
 
-    Deserialize(*obj, archive);
+    if (pointerState == PointerState::CORRECT) {
+      obj = std::make_shared<T>();
+      Deserialize(*obj, archive);
+    }
   }
 
   // I was used to add third dummy parameter because there is already method
@@ -385,6 +388,9 @@ class Serializer {
   // Private const definitions.
   static const int UNDEFINED_REFERENCE_INDEX;
   static const int UNDEFINED_OBJECT_UNIQUE_ID;
+  static const int POINTER_SIZE;
+
+  enum class PointerState { NONE, CORRECT, INCORRECT };
 
   // Thread-local reference maps and object counter.
 
