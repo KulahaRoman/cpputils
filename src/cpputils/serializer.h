@@ -133,48 +133,63 @@ class Serializer {
   }
 
   template <class T>
-  static void Serialize(const std::shared_ptr<T>& obj, BinaryArchive& archive) {
-    auto pointerState = !!obj ? PointerState::CORRECT : PointerState::INCORRECT;
+  static void Serialize(const std::unique_ptr<T>& pointer,
+                        BinaryArchive& archive) {
+    auto pointerState = pointer ? PointerState::VALID : PointerState::INVALID;
     Serialize(reinterpret_cast<int&>(pointerState), archive);
 
-    if (pointerState == PointerState::CORRECT) {
-      Serialize(*obj, archive);
+    if (pointerState == PointerState::VALID) {
+      Serialize(*pointer, archive);
     }
   }
 
-  template <class T, class Enable = typename std::enable_if<
-                         std::is_base_of<Serializable<T>, T>::value>::type>
-  static void Serialize(const T& obj, BinaryArchive& archive) {
-    // If serializable object 'obj' was not serialized earlier,
-    // put it into reference map and increment 'objectCount', then actually
-    // serialize.
-
-    // Let's fuck compiler with it's templates.
-    auto objectRawPointer = static_cast<const void*>(&obj);
-
-    if (!referenceMap.count(objectRawPointer)) {
-      referenceMap.emplace(objectRawPointer, objectCount);
-
-      Serialize(objectCount++, archive);
-
-      auto serialUID = obj.GetSerialUID();
-      Serialize(serialUID, archive);
-
-      obj.Serialize(archive);
-    } else {
-      auto index = referenceMap[objectRawPointer];
-      Serialize(index, archive);
+  template <class T>
+  static void Serialize(const std::shared_ptr<T>& pointer,
+                        BinaryArchive& archive) {
+    bool stackFrameFlag;
+    auto stackFrameMarker = reinterpret_cast<long long>(&stackFrameFlag);
+    if (!initialStackFrameMarker) {
+      initialStackFrameMarker = stackFrameMarker;
     }
 
-    // The end of serializable objects tree, clear reference map and object
-    // counter.
-    if (referenceMap.count(objectRawPointer)) {
-      auto index = referenceMap[objectRawPointer];
-      if (index == 0) {
-        objectCount = 0;
-        referenceMap.clear();
+    auto pointerState = pointer ? PointerState::VALID : PointerState::INVALID;
+    Serialize(reinterpret_cast<int&>(pointerState), archive);
+
+    auto erasedSharedPointer = std::static_pointer_cast<void>(pointer);
+
+    if (pointerState == PointerState::VALID) {
+      if (!referenceMap.count(erasedSharedPointer)) {
+        referenceMap.emplace(erasedSharedPointer, referenceCount);
+
+        Serialize(referenceCount++, archive);
+        Serialize(*pointer, archive);
+      } else {
+        auto index = referenceMap[erasedSharedPointer];
+        Serialize(index, archive);
       }
     }
+
+    if (stackFrameMarker == initialStackFrameMarker) {
+      initialStackFrameMarker = 0;
+      referenceCount = 0;
+      referenceMap.clear();
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::weak_ptr<T>& pointer,
+                        BinaryArchive& archive) {
+    auto lockedSharedPointer = pointer.lock();
+    if (lockedSharedPointer) {
+      Serialize(lockedSharedPointer, archive);
+    }
+  }
+
+  static void Serialize(const Serializable& object, BinaryArchive& archive) {
+    // auto serialUID = object.GetSerialUID();
+    // Serialize(serialUID, archive);
+
+    object.Serialize(archive);
   }
 
   template <class T, class Enable = typename std::enable_if<
@@ -322,54 +337,68 @@ class Serializer {
   }
 
   template <class T>
-  static void Deserialize(std::shared_ptr<T>& obj, BinaryArchive& archive) {
+  static void Deserialize(std::unique_ptr<T>& pointer, BinaryArchive& archive) {
     auto pointerState = PointerState::NONE;
     Deserialize(reinterpret_cast<int&>(pointerState), archive);
 
-    if (pointerState == PointerState::CORRECT) {
-      obj = std::make_shared<T>();
-      Deserialize(*obj, archive);
+    if (pointerState == PointerState::VALID) {
+      pointer = std::make_unique<T>();
+      Deserialize(*pointer, archive);
     }
   }
 
-  // I was used to add third dummy parameter because there is already method
-  // with same signature (integral types deserializer).
   template <class T>
-  static void Deserialize(
-      T& obj, BinaryArchive& archive,
-      typename std::enable_if<
-          std::is_base_of<Serializable<T>, T>::value>::type* = nullptr) {
-    // Read reference index of serializable object.
-    auto index = UNDEFINED_REFERENCE_INDEX;
-    Deserialize(index, archive);
-
-    // If there is no object with such reference index in reference map,
-    // deserialize it and put into reference map.
-    if (!reverseReferenceMap.count(index)) {
-      // Read & check unique serial ID.
-      auto serialUID = UNDEFINED_OBJECT_UNIQUE_ID;
-      Deserialize(serialUID, archive);
-
-      if (serialUID != obj.GetSerialUID()) {
-        throw std::runtime_error(
-            "Failed to deserialize object (wrong UID or corrupted data).");
-      }
-
-      auto objectRawPointer = static_cast<const void*>(&obj);
-
-      reverseReferenceMap.emplace(index, objectRawPointer);
-      obj.Deserialize(archive);
-    } else {
-      // If there is already an object with such reference index, don't
-      // deserialize it again, just assign a copy of an previously deserialized
-      // object via copy assignment operator.
-      obj = *static_cast<const T*>(reverseReferenceMap[index]);
+  static void Deserialize(std::shared_ptr<T>& pointer, BinaryArchive& archive) {
+    bool stackFrameFlag;
+    auto stackFrameMarker = reinterpret_cast<long long>(&stackFrameFlag);
+    if (!initialStackFrameMarker) {
+      initialStackFrameMarker = stackFrameMarker;
     }
 
-    // The end of object tree, clearing reference map.
-    if (index == 0) {
+    auto pointerState = PointerState::NONE;
+    Deserialize(reinterpret_cast<int&>(pointerState), archive);
+
+    if (pointerState == PointerState::VALID) {
+      auto index = UNDEFINED_REFERENCE_INDEX;
+      Deserialize(index, archive);
+
+      if (!reverseReferenceMap.count(index)) {
+        pointer = std::make_shared<T>();
+
+        auto erasedSharedPointer = std::static_pointer_cast<void>(pointer);
+
+        reverseReferenceMap.emplace(index, erasedSharedPointer);
+
+        Deserialize(*pointer, archive);
+      } else {
+        pointer = std::static_pointer_cast<T>(reverseReferenceMap[index]);
+      }
+    }
+
+    if (stackFrameMarker == initialStackFrameMarker) {
+      initialStackFrameMarker = 0;
       reverseReferenceMap.clear();
     }
+  }
+
+  template <class T>
+  static void Deserialize(std::weak_ptr<T>& pointer, BinaryArchive& archive) {
+    auto lockedSharedPointer = pointer.lock();
+    Deserialize(lockedSharedPointer, archive);
+
+    pointer = lockedSharedPointer;
+  }
+
+  static void Deserialize(Serializable& object, BinaryArchive& archive) {
+    /*auto serialUID = UNDEFINED_OBJECT_UNIQUE_ID;
+    Deserialize(serialUID, archive);
+
+    if (serialUID != object.GetSerialUID()) {
+      throw std::runtime_error(
+          "Failed to deserialize object (wrong UID or corrupted data).");
+    }*/
+
+    object.Deserialize(archive);
   }
 
  private:
@@ -388,17 +417,14 @@ class Serializer {
   // Private const definitions.
   static const int UNDEFINED_REFERENCE_INDEX;
   static const int UNDEFINED_OBJECT_UNIQUE_ID;
-  static const int POINTER_SIZE;
 
-  enum class PointerState { NONE, CORRECT, INCORRECT };
+  enum class PointerState { NONE, VALID, INVALID };
 
-  // Thread-local reference maps and object counter.
+  static thread_local int referenceCount;
 
-  // Used for serialization.
-  static thread_local int objectCount;
-  // Used for serialization.
-  static thread_local std::map<const void*, int> referenceMap;
-  // Used for deserialization.
-  static thread_local std::map<int, const void*> reverseReferenceMap;
+  static thread_local long long initialStackFrameMarker;
+
+  static thread_local std::map<std::shared_ptr<void>, int> referenceMap;
+  static thread_local std::map<int, std::shared_ptr<void>> reverseReferenceMap;
 };
 }  // namespace CppUtils

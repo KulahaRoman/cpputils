@@ -3,46 +3,99 @@
 #include <cpputils/serializer.h>
 #include <gtest/gtest.h>
 
-//              A>----.
-//              |     |
-//              B     |
+using namespace CppUtils;
+
+class Person : public Serializable {
+ public:
+  Person() { Logger::Information("Class Person constructed."); }
+  Person(const std::string& name,
+         const std::shared_ptr<Person>& bestie = nullptr)
+      : name(name), bestie(bestie) {
+    Logger::Information("Class Person constructed with arguments ({}).", name);
+  }
+  ~Person() { Logger::Information("Class Person destructed."); }
+
+  std::string GetName() const { return name; }
+  void SetName(const std::string& name) { this->name = name; }
+
+  std::shared_ptr<Person> GetBestie() const { return bestie.lock(); }
+  void SetBestie(const std::shared_ptr<Person>& bestie) {
+    this->bestie = bestie;
+  }
+
+  void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(name, archive);
+    Serializer::Serialize(bestie, archive);
+  }
+  void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(name, archive);
+    Serializer::Deserialize(bestie, archive);
+
+    if (bestie.lock()->bestie.lock()) {
+      cacheSharedObject(bestie);
+    }
+  }
+
+ private:
+  std::string name;
+  std::weak_ptr<Person> bestie;
+};
+
+TEST(SerializerTest, TwoFriendsCyclicReferences) {
+  auto first = std::make_shared<Person>("Roman");
+  auto second = std::make_shared<Person>("Anton");
+
+  first->SetBestie(second);
+  second->SetBestie(first);
+
+  BinaryArchive archive;
+  Serializer::Serialize(first, archive);
+
+  auto person = std::shared_ptr<Person>();
+  Serializer::Deserialize(person, archive);
+
+  ASSERT_STREQ(person->GetName().c_str(), first->GetName().c_str());
+  ASSERT_STREQ(person->GetBestie()->GetName().c_str(),
+               second->GetName().c_str());
+}
+
+//        Objects hierarchy
+//          .->-A>----.
+//          |   |     |
+//          .---B     |
 //             / \    |
 //            C   D   |
 //            |   |   |
 //            E-<-F-<-.
 //
 
-class E : public CppUtils::Serializable<E> {
+class E : public Serializable {
  public:
-  E() : num(0) {}
-  E(int num) : num(num) {}
+  E() : num(0) { Logger::Information("Class E constructed."); }
+  E(int num) : num(num) {
+    Logger::Information("Class E constructed with arguments.");
+  }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(num, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(num, archive);
   }
-
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(num, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 412; }
-
-  E& operator=(const E& other) override {
-    num = other.num;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(num, archive);
   }
 
  private:
   int num;
 };
 
-class F : public CppUtils::Serializable<F> {
+class F : public Serializable {
  public:
-  F() : num(0) {}
-  F(int num, const std::shared_ptr<E>& e) : num(num), e(e) {}
+  F() : num(0) { Logger::Information("Class F constructed."); }
+  F(int num, const std::shared_ptr<E>& e) : num(num), e(e) {
+    Logger::Information("Class F constructed with arguments.");
+  }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
@@ -50,22 +103,13 @@ class F : public CppUtils::Serializable<F> {
   void SetE(const std::shared_ptr<E>& f) { this->e = e; }
   std::shared_ptr<E> GetE() const { return e; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(num, archive);
-    CppUtils::Serializer::Serialize(e, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(num, archive);
+    Serializer::Serialize(e, archive);
   }
-
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(num, archive);
-    CppUtils::Serializer::Deserialize(e, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 21412; }
-
-  F& operator=(const F& other) override {
-    num = other.num;
-    e = other.e;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(num, archive);
+    Serializer::Deserialize(e, archive);
   }
 
  private:
@@ -73,64 +117,59 @@ class F : public CppUtils::Serializable<F> {
   std::shared_ptr<E> e;
 };
 
-class D : public CppUtils::Serializable<D> {
+class D : public Serializable {
  public:
-  D() {}
-  D(const std::shared_ptr<F>& f) : f(f) {}
+  D() { Logger::Information("Class D constructed."); }
+  D(const std::shared_ptr<F>& f) : f(f) {
+    Logger::Information("Class D constructed with arguments.");
+  }
 
   void SetF(const std::shared_ptr<F>& f) { this->f = f; }
   std::shared_ptr<F> GetF() const { return f; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(f, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(f, archive);
   }
-
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(f, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 214; }
-
-  D& operator=(const D& other) override {
-    f = other.f;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(f, archive);
   }
 
  private:
   std::shared_ptr<F> f;
 };
 
-class C : public CppUtils::Serializable<C> {
+class C : public Serializable {
  public:
-  C() {}
-  C(const std::shared_ptr<E>& e) : e(e) {}
+  C() { Logger::Information("Class C constructed."); }
+  C(const std::shared_ptr<E>& e) : e(e) {
+    Logger::Information("Class C constructed with arguments.");
+  }
 
   void SetE(const std::shared_ptr<E>& e) { this->e = e; }
   std::shared_ptr<E> GetE() const { return e; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(e, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(e, archive);
   }
-
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(e, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 14; }
-
-  C& operator=(const C& other) override {
-    e = other.e;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(e, archive);
   }
 
  private:
   std::shared_ptr<E> e;
 };
 
-class B : public CppUtils::Serializable<B> {
+class A;
+
+class B : public Serializable {
  public:
-  B() {}
-  B(const std::shared_ptr<C>& c, const std::shared_ptr<D>& d) : c(c), d(d) {}
+  B() { Logger::Information("Class B constructed."); }
+  B(const std::shared_ptr<C>& c, const std::shared_ptr<D>& d) : c(c), d(d) {
+    Logger::Information("Class B constructed with arguments.");
+  }
+
+  void SetA(const std::shared_ptr<A>& a) { this->a = a; }
+  std::shared_ptr<A> GetA() const { return a.lock(); }
 
   void SetC(const std::shared_ptr<C>& c) { this->c = c; }
   std::shared_ptr<C> GetC() const { return c; }
@@ -138,33 +177,29 @@ class B : public CppUtils::Serializable<B> {
   void SetD(const std::shared_ptr<D>& d) { this->d = d; }
   std::shared_ptr<D> GetD() const { return d; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(c, archive);
-    CppUtils::Serializer::Serialize(d, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(a, archive);
+    Serializer::Serialize(c, archive);
+    Serializer::Serialize(d, archive);
   }
-
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(c, archive);
-    CppUtils::Serializer::Deserialize(d, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 2547; }
-
-  B& operator=(const B& other) override {
-    c = other.c;
-    d = other.d;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(a, archive);
+    Serializer::Deserialize(c, archive);
+    Serializer::Deserialize(d, archive);
   }
 
  private:
+  std::weak_ptr<A> a;
   std::shared_ptr<C> c;
   std::shared_ptr<D> d;
 };
 
-class A : public CppUtils::Serializable<A> {
+class A : public Serializable {
  public:
-  A() {}
-  A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {}
+  A() { Logger::Information("Class A constructed."); }
+  A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {
+    Logger::Information("Class A constructed with arguments.");
+  }
 
   void SetB(const std::shared_ptr<B>& b) { this->b = b; }
   std::shared_ptr<B> GetB() const { return b; }
@@ -172,21 +207,13 @@ class A : public CppUtils::Serializable<A> {
   void SetF(const std::shared_ptr<F>& f) { this->f = f; }
   std::shared_ptr<F> GetF() const { return f; }
 
-  virtual void Serialize(CppUtils::BinaryArchive& archive) const override {
-    CppUtils::Serializer::Serialize(b, archive);
-    CppUtils::Serializer::Serialize(f, archive);
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(b, archive);
+    Serializer::Serialize(f, archive);
   }
-  virtual void Deserialize(CppUtils::BinaryArchive& archive) override {
-    CppUtils::Serializer::Deserialize(b, archive);
-    CppUtils::Serializer::Deserialize(f, archive);
-  }
-
-  virtual int GetSerialUID() const override { return 7; }
-
-  A& operator=(const A& other) override {
-    b = other.b;
-    f = other.f;
-    return *this;
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(b, archive);
+    Serializer::Deserialize(f, archive);
   }
 
  private:
@@ -194,27 +221,27 @@ class A : public CppUtils::Serializable<A> {
   std::shared_ptr<F> f;
 };
 
-TEST(SerializerTest, Test) {
-  auto e = std::make_shared<E>(2);
-  auto f = std::make_shared<F>(1, e);
+TEST(SerializerTest, ComplicatedCyclicReferences) {
+  auto eOut = std::make_shared<E>(2);
+  auto fOut = std::make_shared<F>(1, eOut);
 
-  auto c = std::make_shared<C>(e);
-  auto d = std::make_shared<D>(f);
+  auto cOut = std::make_shared<C>(eOut);
+  auto dOut = std::make_shared<D>(fOut);
 
-  auto b = std::make_shared<B>(c, d);
+  auto bOut = std::make_shared<B>(cOut, dOut);
 
-  auto aOut = std::make_shared<A>(b, f);
+  auto aOut = std::make_shared<A>(bOut, fOut);
 
-  CppUtils::BinaryArchive archive;
-  CppUtils::Serializer::Serialize(aOut, archive);
+  bOut->SetA(aOut);
+
+  BinaryArchive archive;
+  Serializer::Serialize(aOut, archive);
 
   auto aIn = std::shared_ptr<A>();
-  CppUtils::Serializer::Deserialize(aIn, archive);
+  Serializer::Deserialize(aIn, archive);
 
-  CppUtils::Serializer::Serialize(aOut, archive);
-  CppUtils::Serializer::Deserialize(aIn, archive);
-
-  ASSERT_EQ(aIn->GetB()->GetC()->GetE()->GetNumber(), e->GetNumber());
-  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetNumber(), f->GetNumber());
-  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetE()->GetNumber(), e->GetNumber());
+  ASSERT_EQ(aIn->GetB()->GetC()->GetE()->GetNumber(), eOut->GetNumber());
+  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetNumber(), fOut->GetNumber());
+  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetE()->GetNumber(),
+            eOut->GetNumber());
 }

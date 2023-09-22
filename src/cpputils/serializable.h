@@ -1,30 +1,41 @@
 #pragma once
+#include <memory>
+#include <set>
+
 #include "binaryarchive.h"
 
 namespace CppUtils {
 // Represents interface that marks entity so it can be serialized/deserialized.
 // Each class which derives 'Serializable' must provide at least default
 // constructor, and must override all of pure virtual methods.
-// Here is used CRTP for virtual copy assignment operator to specify complete
-// type instead of 'const Serializable&' which should be staticaly casted to
-// complete type by user in every derived class to access some derived class
-// fields.
 
-template <class Derived>
 class Serializable {
  public:
-  // Serializes class fields of the derived entity.
   virtual void Serialize(BinaryArchive& archive) const = 0;
-
-  // Deserializes class fields of the derived entity.
   virtual void Deserialize(BinaryArchive& archive) = 0;
 
-  // Returns unique ID of derived entity.
-  virtual int GetSerialUID() const = 0;
+  virtual ~Serializable() { cachedSharedObjects.clear(); };
 
-  // Mandatory for deserialization process.
-  virtual Derived& operator=(const Derived& other) = 0;
+ protected:
+  template <class T>
+  void cacheSharedObject(const std::shared_ptr<T>& object);
 
-  virtual ~Serializable() {}
+  template <class T>
+  void cacheSharedObject(const std::weak_ptr<T>& object);
+
+ private:
+  std::set<std::shared_ptr<void>> cachedSharedObjects;
 };
+
+template <class T>
+void Serializable::cacheSharedObject(const std::shared_ptr<T>& object) {
+  auto erasedSharedPointer = std::static_pointer_cast<void>(object);
+  cachedSharedObjects.emplace(erasedSharedPointer);
+}
+
+template <class T>
+void Serializable::cacheSharedObject(const std::weak_ptr<T>& object) {
+  auto erasedSharedPointer = std::static_pointer_cast<void>(object.lock());
+  cachedSharedObjects.emplace(erasedSharedPointer);
+}
 }  // namespace CppUtils
