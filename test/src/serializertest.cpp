@@ -5,6 +5,188 @@
 
 using namespace CppUtils;
 
+enum class Answer { NONE, YES, NO };
+
+TEST(SerilizerTest, Enum) {
+  auto out = Answer::YES;
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  auto in = Answer::NONE;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, String) {
+  std::string out{"Hello, World!"};
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::string in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Wstring) {
+  std::wstring out{L"Hello, World!"};
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::wstring in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Array) {
+  std::array<int, 5> out{0, 1, 2, 3, 4};
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::array<int, 5> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Pair) {
+  std::pair<int, std::string> out{5, "Machine"};
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::pair<int, std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Map) {
+  std::map<int, std::string> out;
+  out.emplace(0, "Roman");
+  out.emplace(1, "Anton");
+  out.emplace(2, "Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::map<int, std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, UnorderedMap) {
+  std::unordered_map<int, std::string> out;
+  out.emplace(0, "Roman");
+  out.emplace(1, "Anton");
+  out.emplace(2, "Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::unordered_map<int, std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Set) {
+  std::set<std::string> out;
+  out.emplace("Roman");
+  out.emplace("Anton");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::set<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, UnorderedSet) {
+  std::unordered_set<std::string> out;
+  out.emplace("Roman");
+  out.emplace("Anton");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::unordered_set<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Queue) {
+  std::queue<std::string> out;
+  out.emplace("Roman");
+  out.emplace("Anton");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::queue<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Deque) {
+  std::deque<std::string> out;
+  out.emplace_back("Roman");
+  out.emplace_back("Anton");
+  out.emplace_back("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::deque<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, List) {
+  std::list<std::string> out;
+  out.emplace_back("Roman");
+  out.emplace_back("Anton");
+  out.emplace_back("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::list<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Vector) {
+  std::vector<std::string> out;
+  out.emplace_back("Roman");
+  out.emplace_back("Anton");
+  out.emplace_back("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::vector<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
 //         Objects hierarchy
 //
 //         .->--Person-->-.

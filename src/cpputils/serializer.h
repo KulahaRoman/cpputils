@@ -19,14 +19,14 @@
 
 namespace CppUtils {
 // Represents a singletone class that does mostly all job of serialization.
-// Currently supports integral types, STL strings, several containers and
-// custom Serializable class. Detects and prevents cyclic references like Java
-// does. Checks system endianness in runtime so it's fine to use this serializer
-// to exchange some data between Linux and Windows apps.
+// Currently supports integral types, enum types, STL strings, several
+// containers and custom Serializable class. Detects and prevents cyclic
+// references. Checks system endianness in runtime so it's fine
+// to use this serializer to exchange some data between Linux and Windows apps.
 
 #define CYCLIC_WEAK_REFERENCE(field) \
   if (field.lock()->field.lock()) {  \
-    cacheSharedObject(bestie);       \
+    cacheSharedObject(field);        \
   }
 
 class Serializer {
@@ -77,13 +77,14 @@ class Serializer {
     }
   }
 
-  static void Serialize(const std::wstring& str, BinaryArchive& archive) {
+  static void Serialize(const std::wstring& wstr, BinaryArchive& archive) {
     try {
-      auto strSizeInBytes = static_cast<uint64_t>(str.size() * sizeof(wchar_t));
+      auto strSizeInBytes =
+          static_cast<uint64_t>(wstr.size() * sizeof(wchar_t));
 
       Serialize(strSizeInBytes, archive);
 
-      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
+      archive.Write(reinterpret_cast<const unsigned char*>(wstr.data()),
                     static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::wstring.");
@@ -126,12 +127,12 @@ class Serializer {
   }
 
   template <class K, class V>
-  static void Serialize(const std::unordered_map<K, V>& map,
+  static void Serialize(const std::unordered_map<K, V>& umap,
                         BinaryArchive& archive) {
     try {
-      Serialize(static_cast<uint64_t>(map.size()), archive);
+      Serialize(static_cast<uint64_t>(umap.size()), archive);
 
-      for (const auto& [key, value] : map) {
+      for (const auto& [key, value] : umap) {
         Serialize(key, archive);
         Serialize(value, archive);
       }
@@ -154,12 +155,12 @@ class Serializer {
   }
 
   template <class T>
-  static void Serialize(const std::unordered_set<T>& set,
+  static void Serialize(const std::unordered_set<T>& uset,
                         BinaryArchive& archive) {
     try {
-      Serialize(static_cast<uint64_t>(set.size()), archive);
+      Serialize(static_cast<uint64_t>(uset.size()), archive);
 
-      for (const auto& value : set) {
+      for (const auto& value : uset) {
         Serialize(value, archive);
       }
     } catch (...) {
@@ -172,8 +173,11 @@ class Serializer {
     try {
       Serialize(static_cast<uint64_t>(queue.size()), archive);
 
-      for (const auto& value : queue) {
-        Serialize(value, archive);
+      auto queueCopy = queue;
+
+      while (!queueCopy.empty()) {
+        Serialize(queueCopy.front(), archive);
+        queueCopy.pop();
       }
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::queue<T>.");
@@ -181,11 +185,11 @@ class Serializer {
   }
 
   template <class T>
-  static void Serialize(const std::deque<T>& queue, BinaryArchive& archive) {
+  static void Serialize(const std::deque<T>& deque, BinaryArchive& archive) {
     try {
-      Serialize(static_cast<uint64_t>(queue.size()), archive);
+      Serialize(static_cast<uint64_t>(deque.size()), archive);
 
-      for (const auto& value : queue) {
+      for (const auto& value : deque) {
         Serialize(value, archive);
       }
     } catch (...) {
@@ -323,15 +327,15 @@ class Serializer {
     }
   }
 
-  static void Deserialize(std::wstring& str, BinaryArchive& archive) {
+  static void Deserialize(std::wstring& wstr, BinaryArchive& archive) {
     try {
       auto strSizeInBytes = 0ull;
 
       Deserialize(strSizeInBytes, archive);
 
-      str.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
+      wstr.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
 
-      archive.Read(reinterpret_cast<unsigned char*>(str.data()),
+      archive.Read(reinterpret_cast<unsigned char*>(wstr.data()),
                    static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::wstring.");
@@ -389,7 +393,7 @@ class Serializer {
   }
 
   template <class K, class V>
-  static void Deserialize(std::unordered_map<K, V>& map,
+  static void Deserialize(std::unordered_map<K, V>& umap,
                           BinaryArchive& archive) {
     auto mapSize = 0ull;
 
@@ -403,7 +407,7 @@ class Serializer {
         Deserialize(key, archive);
         Deserialize(value, archive);
 
-        map.emplace(std::move(key), std::move(value));
+        umap.emplace(std::move(key), std::move(value));
       }
     } catch (...) {
       throw std::runtime_error(
@@ -431,7 +435,7 @@ class Serializer {
   }
 
   template <class T>
-  static void Deserialize(std::unordered_set<T>& set, BinaryArchive& archive) {
+  static void Deserialize(std::unordered_set<T>& uset, BinaryArchive& archive) {
     auto setSize = 0ull;
 
     try {
@@ -442,7 +446,7 @@ class Serializer {
 
         Deserialize(value, archive);
 
-        set.emplace(std::move(value));
+        uset.emplace(std::move(value));
       }
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::unordered_set<T>.");
@@ -473,7 +477,7 @@ class Serializer {
     auto dequeSize = 0ull;
 
     try {
-      Deserialize(deque, archive);
+      Deserialize(dequeSize, archive);
 
       for (auto i = 0ull; i < dequeSize; i++) {
         T&& value{};
@@ -595,7 +599,6 @@ class Serializer {
     return temp;
   }
 
-  // Private const definitions.
   static const int UNDEFINED_REFERENCE_INDEX;
   static const int UNDEFINED_OBJECT_UNIQUE_ID;
 
