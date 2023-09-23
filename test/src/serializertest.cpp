@@ -172,6 +172,21 @@ TEST(SerilizerTest, List) {
   ASSERT_TRUE(out == in);
 }
 
+TEST(SerilizerTest, ForwardList) {
+  std::forward_list<std::string> out;
+  out.emplace_front("Roman");
+  out.emplace_front("Anton");
+  out.emplace_front("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::forward_list<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
 TEST(SerilizerTest, Vector) {
   std::vector<std::string> out;
   out.emplace_back("Roman");

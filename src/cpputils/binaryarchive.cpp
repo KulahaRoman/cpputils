@@ -87,7 +87,7 @@ void BinaryArchive::SetWritePosition(int32_t pos, SeekDirection seekDir) {
   auto newPosition = static_cast<std::size_t>(
       calculateNewPosition(pos, SeekType::WRITE, seekDir));
 
-  if (newPosition < 0 || newPosition >= storageSize) {
+  if (newPosition < 0 || newPosition > storageSize) {
     throw std::runtime_error(
         "Failed to set new writing position: out of bounds.");
   }
@@ -141,7 +141,7 @@ int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
   auto storageSize = data.size();
 
   if (storageSize == 0) {
-    return UNDEFINED_POSITION;
+    return 0;
   }
 
   auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);

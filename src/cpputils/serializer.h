@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <deque>
+#include <forward_list>
 #include <list>
 #include <map>
 #include <memory>
@@ -207,6 +208,32 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::list<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::forward_list<T>& flist,
+                        BinaryArchive& archive) {
+    try {
+      auto initialArchivePosition = archive.GetWritePosition();
+
+      auto size = 0ull;
+      Serialize(size, archive);
+
+      for (const auto& value : flist) {
+        Serialize(value, archive);
+        size++;
+      }
+
+      auto currentArchivePosition = archive.GetWritePosition();
+      archive.SetWritePosition(initialArchivePosition);
+
+      Serialize(size, archive);
+
+      archive.SetWritePosition(currentArchivePosition);
+
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::forward_list<T>.");
     }
   }
 
@@ -507,6 +534,28 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::list<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::forward_list<T>& flist, BinaryArchive& archive) {
+    auto listSize = 0ull;
+
+    try {
+      Deserialize(listSize, archive);
+
+      for (auto i = 0ull; i < listSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        flist.emplace_front(std::move(value));
+      }
+
+      flist.reverse();
+
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::forward_list<T>.");
     }
   }
 
