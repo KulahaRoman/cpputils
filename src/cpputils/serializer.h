@@ -1,12 +1,16 @@
 #pragma once
 #include <algorithm>
+#include <deque>
 #include <list>
 #include <map>
 #include <memory>
+#include <queue>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "binaryarchive.h"
@@ -20,11 +24,17 @@ namespace CppUtils {
 // does. Checks system endianness in runtime so it's fine to use this serializer
 // to exchange some data between Linux and Windows apps.
 
+#define CYCLIC_WEAK_REFERENCE(field) \
+  if (field.lock()->field.lock()) {  \
+    cacheSharedObject(bestie);       \
+  }
+
 class Serializer {
  public:
-  template <class T, class Enable = typename std::enable_if<
-                         std::is_integral<T>::value>::type>
-  static void Serialize(const T value, BinaryArchive& archive) {
+  template <class T>
+  static void Serialize(
+      const T value, BinaryArchive& archive,
+      std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
       // let's assume that network endian is big
       T temp = 0;
@@ -40,6 +50,17 @@ class Serializer {
                     sizeof(temp));
     } catch (...) {
       throw std::runtime_error("Failed to serialize integral type value.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(
+      const T value, BinaryArchive& archive,
+      std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
+    try {
+      Serialize(static_cast<std::underlying_type_t<T>>(value), archive);
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize enum type value.");
     }
   }
 
@@ -79,6 +100,17 @@ class Serializer {
     }
   }
 
+  template <class T, std::size_t N>
+  static void Serialize(const std::array<T, N>& array, BinaryArchive& archive) {
+    try {
+      for (const auto& value : array) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::array<T,N>.");
+    }
+  }
+
   template <class K, class V>
   static void Serialize(const std::map<K, V>& map, BinaryArchive& archive) {
     try {
@@ -93,6 +125,21 @@ class Serializer {
     }
   }
 
+  template <class K, class V>
+  static void Serialize(const std::unordered_map<K, V>& map,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(map.size()), archive);
+
+      for (const auto& [key, value] : map) {
+        Serialize(key, archive);
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::unordered_map<K,V>.");
+    }
+  }
+
   template <class T>
   static void Serialize(const std::set<T>& set, BinaryArchive& archive) {
     try {
@@ -103,6 +150,46 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::set<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::unordered_set<T>& set,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(set.size()), archive);
+
+      for (const auto& value : set) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::unordered_set<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::queue<T>& queue, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(queue.size()), archive);
+
+      for (const auto& value : queue) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::queue<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::deque<T>& queue, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(queue.size()), archive);
+
+      for (const auto& value : queue) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::deque<T>.");
     }
   }
 
@@ -136,7 +223,7 @@ class Serializer {
   static void Serialize(const std::unique_ptr<T>& pointer,
                         BinaryArchive& archive) {
     auto pointerState = pointer ? PointerState::VALID : PointerState::INVALID;
-    Serialize(reinterpret_cast<int&>(pointerState), archive);
+    Serialize(pointerState, archive);
 
     if (pointerState == PointerState::VALID) {
       Serialize(*pointer, archive);
@@ -153,7 +240,7 @@ class Serializer {
     }
 
     auto pointerState = pointer ? PointerState::VALID : PointerState::INVALID;
-    Serialize(reinterpret_cast<int&>(pointerState), archive);
+    Serialize(pointerState, archive);
 
     auto erasedSharedPointer = std::static_pointer_cast<void>(pointer);
 
@@ -186,15 +273,13 @@ class Serializer {
   }
 
   static void Serialize(const Serializable& object, BinaryArchive& archive) {
-    // auto serialUID = object.GetSerialUID();
-    // Serialize(serialUID, archive);
-
     object.Serialize(archive);
   }
 
-  template <class T, class Enable = typename std::enable_if<
-                         std::is_integral<T>::value>::type>
-  static void Deserialize(T& value, BinaryArchive& archive) {
+  template <class T>
+  static void Deserialize(
+      T& value, BinaryArchive& archive,
+      std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
       T temp = 0;
 
@@ -209,6 +294,17 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to deserialize integral type value.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(
+      T& value, BinaryArchive& archive,
+      std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
+    try {
+      Deserialize(reinterpret_cast<std::underlying_type_t<T>&>(value), archive);
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize enum type value.");
     }
   }
 
@@ -258,6 +354,19 @@ class Serializer {
     }
   }
 
+  template <class T, std::size_t N>
+  static void Deserialize(std::array<T, N>& array, BinaryArchive& archive) {
+    try {
+      for (auto i = 0ull; i < N; i++) {
+        T&& value{};
+        Deserialize(value, archive);
+        array[i] = std::move(value);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::array<T,N>.");
+    }
+  }
+
   template <class K, class V>
   static void Deserialize(std::map<K, V>& map, BinaryArchive& archive) {
     auto mapSize = 0ull;
@@ -279,6 +388,29 @@ class Serializer {
     }
   }
 
+  template <class K, class V>
+  static void Deserialize(std::unordered_map<K, V>& map,
+                          BinaryArchive& archive) {
+    auto mapSize = 0ull;
+
+    try {
+      Deserialize(mapSize, archive);
+
+      for (auto i = 0ull; i < mapSize; i++) {
+        K&& key{};
+        V&& value{};
+
+        Deserialize(key, archive);
+        Deserialize(value, archive);
+
+        map.emplace(std::move(key), std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error(
+          "Failed to deserialize std::unordered_map<K,V>.");
+    }
+  }
+
   template <class T>
   static void Deserialize(std::set<T>& set, BinaryArchive& archive) {
     auto setSize = 0ull;
@@ -295,6 +427,63 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::set<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::unordered_set<T>& set, BinaryArchive& archive) {
+    auto setSize = 0ull;
+
+    try {
+      Deserialize(setSize, archive);
+
+      for (auto i = 0ull; i < setSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        set.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::unordered_set<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::queue<T>& queue, BinaryArchive& archive) {
+    auto queueSize = 0ull;
+
+    try {
+      Deserialize(queueSize, archive);
+
+      for (auto i = 0ull; i < queueSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        queue.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::queue<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::deque<T>& deque, BinaryArchive& archive) {
+    auto dequeSize = 0ull;
+
+    try {
+      Deserialize(deque, archive);
+
+      for (auto i = 0ull; i < dequeSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        deque.emplace_back(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::deque<T>.");
     }
   }
 
@@ -339,7 +528,7 @@ class Serializer {
   template <class T>
   static void Deserialize(std::unique_ptr<T>& pointer, BinaryArchive& archive) {
     auto pointerState = PointerState::NONE;
-    Deserialize(reinterpret_cast<int&>(pointerState), archive);
+    Deserialize(pointerState, archive);
 
     if (pointerState == PointerState::VALID) {
       pointer = std::make_unique<T>();
@@ -356,7 +545,7 @@ class Serializer {
     }
 
     auto pointerState = PointerState::NONE;
-    Deserialize(reinterpret_cast<int&>(pointerState), archive);
+    Deserialize(pointerState, archive);
 
     if (pointerState == PointerState::VALID) {
       auto index = UNDEFINED_REFERENCE_INDEX;
@@ -390,14 +579,6 @@ class Serializer {
   }
 
   static void Deserialize(Serializable& object, BinaryArchive& archive) {
-    /*auto serialUID = UNDEFINED_OBJECT_UNIQUE_ID;
-    Deserialize(serialUID, archive);
-
-    if (serialUID != object.GetSerialUID()) {
-      throw std::runtime_error(
-          "Failed to deserialize object (wrong UID or corrupted data).");
-    }*/
-
     object.Deserialize(archive);
   }
 

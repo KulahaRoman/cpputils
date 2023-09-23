@@ -18,20 +18,11 @@ class Serializable {
 
  protected:
   template <class T>
-  void cacheSharedObject(const std::shared_ptr<T>& object);
-
-  template <class T>
   void cacheSharedObject(const std::weak_ptr<T>& object);
 
  private:
   std::set<std::shared_ptr<void>> cachedSharedObjects;
 };
-
-template <class T>
-void Serializable::cacheSharedObject(const std::shared_ptr<T>& object) {
-  auto erasedSharedPointer = std::static_pointer_cast<void>(object);
-  cachedSharedObjects.emplace(erasedSharedPointer);
-}
 
 template <class T>
 void Serializable::cacheSharedObject(const std::weak_ptr<T>& object) {

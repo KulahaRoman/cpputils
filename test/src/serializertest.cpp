@@ -5,6 +5,13 @@
 
 using namespace CppUtils;
 
+//         Objects hierarchy
+//
+//         .->--Person-->-.
+//         |              |
+//         |              |
+//         .-<--Person--<-.
+
 class Person : public Serializable {
  public:
   Person() { Logger::Information("Class Person constructed."); }
@@ -31,9 +38,7 @@ class Person : public Serializable {
     Serializer::Deserialize(name, archive);
     Serializer::Deserialize(bestie, archive);
 
-    if (bestie.lock()->bestie.lock()) {
-      cacheSharedObject(bestie);
-    }
+    CYCLIC_WEAK_REFERENCE(bestie)
   }
 
  private:
@@ -59,7 +64,8 @@ TEST(SerializerTest, TwoFriendsCyclicReferences) {
                second->GetName().c_str());
 }
 
-//        Objects hierarchy
+//       Objects hierarchy
+//
 //          .->-A>----.
 //          |   |     |
 //          .---B     |
@@ -75,6 +81,7 @@ class E : public Serializable {
   E(int num) : num(num) {
     Logger::Information("Class E constructed with arguments.");
   }
+  ~E() { Logger::Information("Class E destructed."); }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
@@ -96,6 +103,7 @@ class F : public Serializable {
   F(int num, const std::shared_ptr<E>& e) : num(num), e(e) {
     Logger::Information("Class F constructed with arguments.");
   }
+  ~F() { Logger::Information("Class F destructed."); }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
@@ -123,6 +131,7 @@ class D : public Serializable {
   D(const std::shared_ptr<F>& f) : f(f) {
     Logger::Information("Class D constructed with arguments.");
   }
+  ~D() { Logger::Information("Class D destructed."); }
 
   void SetF(const std::shared_ptr<F>& f) { this->f = f; }
   std::shared_ptr<F> GetF() const { return f; }
@@ -144,6 +153,7 @@ class C : public Serializable {
   C(const std::shared_ptr<E>& e) : e(e) {
     Logger::Information("Class C constructed with arguments.");
   }
+  ~C() { Logger::Information("Class C destructed."); }
 
   void SetE(const std::shared_ptr<E>& e) { this->e = e; }
   std::shared_ptr<E> GetE() const { return e; }
@@ -167,6 +177,7 @@ class B : public Serializable {
   B(const std::shared_ptr<C>& c, const std::shared_ptr<D>& d) : c(c), d(d) {
     Logger::Information("Class B constructed with arguments.");
   }
+  ~B() { Logger::Information("Class B destructed."); }
 
   void SetA(const std::shared_ptr<A>& a) { this->a = a; }
   std::shared_ptr<A> GetA() const { return a.lock(); }
@@ -200,6 +211,7 @@ class A : public Serializable {
   A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {
     Logger::Information("Class A constructed with arguments.");
   }
+  ~A() { Logger::Information("Class A destructed."); }
 
   void SetB(const std::shared_ptr<B>& b) { this->b = b; }
   std::shared_ptr<B> GetB() const { return b; }
