@@ -87,7 +87,7 @@ Encryption represents `CppUtils::Encryption::Encryptor` interface, `CppUtils::En
 This interface declares two virtual methods `std::vector<unsigned char> Encryptor::Encrypt(const std::vector<unsigned char>& input)` and `std::vector<unsigned char> Encryptor::Decrypt(const std::vector<unsigned char>& input)`.
 
 ## Synchronization
-Synchronization represents 'CppUtils::Synchronization::CountDownLatch' class which is similar to Java's latch implementation.
+Synchronization represents `CppUtils::Synchronization::CountDownLatch` class which is similar to Java's latch implementation.
 
 ## Logging
 Singleton class `CppUtils::Logger` provides 4 static methods depending on level of each log:
