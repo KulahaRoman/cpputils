@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+// NOT MINE
+
 class SHA256 {
  public:
   SHA256();
