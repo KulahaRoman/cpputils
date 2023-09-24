@@ -1,6 +1,7 @@
 #include "endiannessprovider.h"
 
 namespace CppUtils {
+namespace Serialization {
 EndiannessProvider::Endianness EndiannessProvider::GetSystemEndianness() {
   const int value{0x01};
   const void* address{static_cast<const void*>(&value)};
@@ -10,4 +11,5 @@ EndiannessProvider::Endianness EndiannessProvider::GetSystemEndianness() {
   return (*leastSignificantAddress == 0x01) ? Endianness::LITTLE
                                             : Endianness::BIG;
 }
+}  // namespace Serialization
 }  // namespace CppUtils

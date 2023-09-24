@@ -4,6 +4,7 @@
 #include "encryptor.h"
 
 namespace CppUtils {
+namespace Encryption {
 class AbstractEncryptor : public Encryptor {
  public:
   AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
@@ -19,4 +20,5 @@ class AbstractEncryptor : public Encryptor {
   const uint64_t blockSize;
   const uint64_t keySize;
 };
+}  // namespace Encryption
 }  // namespace CppUtils

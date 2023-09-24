@@ -3,7 +3,7 @@
 #include <cpputils/serializer.h>
 #include <gtest/gtest.h>
 
-using namespace CppUtils;
+using namespace CppUtils::Serialization;
 
 enum class Answer { NONE, YES, NO };
 

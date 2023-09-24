@@ -1,6 +1,7 @@
 #include "aes256encryptor.h"
 
 namespace CppUtils {
+namespace Encryption {
 const uint64_t AES256Encryptor::BLOCK_SIZE = 16ull;
 const uint64_t AES256Encryptor::KEY_SIZE = 32ull;
 
@@ -23,4 +24,5 @@ std::vector<unsigned char> AES256Encryptor::Decrypt(
   }
   return aes.DecryptECB(encryptedData, key);
 }
+}  // namespace Encryption
 }  // namespace CppUtils

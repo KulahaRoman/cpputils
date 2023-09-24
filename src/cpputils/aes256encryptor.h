@@ -5,6 +5,7 @@
 #include "aes.h"
 
 namespace CppUtils {
+namespace Encryption {
 class AES256Encryptor : public AbstractEncryptor {
  public:
   AES256Encryptor(const std::vector<unsigned char>& key);
@@ -20,4 +21,5 @@ class AES256Encryptor : public AbstractEncryptor {
 
   AES aes;
 };
+}  // namespace Encryption
 }  // namespace CppUtils

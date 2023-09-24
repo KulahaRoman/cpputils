@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace CppUtils {
+namespace Encryption {
 class Encryptor {
  public:
   virtual std::vector<unsigned char> Encrypt(
@@ -14,5 +15,5 @@ class Encryptor {
 
   virtual ~Encryptor() {}
 };
-
+}  // namespace Encryption
 }  // namespace CppUtils

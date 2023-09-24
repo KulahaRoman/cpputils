@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <sstream>
 
+namespace CppUtils {
+namespace Hashing {
 SHA256::SHA256() : m_blocklen(0), m_bitlen(0) {
   m_state[0] = 0x6a09e667;
   m_state[1] = 0xbb67ae85;
@@ -168,3 +170,5 @@ std::string SHA256::toString(const uint8_t* digest) {
 
   return s.str();
 }
+}  // namespace Hashing
+}  // namespace CppUtils

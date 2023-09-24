@@ -3,8 +3,9 @@
 #include <string>
 #include <vector>
 
+namespace CppUtils {
+namespace Hashing {
 // NOT MINE
-
 class SHA256 {
  public:
   SHA256();
@@ -44,3 +45,5 @@ class SHA256 {
   void pad();
   void revert(uint8_t* hash);
 };
+}  // namespace Hashing
+}  // namespace CppUtils

@@ -2,11 +2,13 @@
 #include <cpputils/sha256hasher.h>
 #include <gtest/gtest.h>
 
+using namespace CppUtils::Hashing;
+
 TEST(HasherTest, MD5) {
   std::string strToHash{"Hello, World!"};
   std::vector<unsigned char> bytesToHash{strToHash.begin(), strToHash.end()};
 
-  auto hasher = std::make_unique<CppUtils::MD5Hasher>();
+  auto hasher = std::make_unique<MD5Hasher>();
   auto hash = hasher->Hash(bytesToHash);
 
   unsigned char preHashBytes[17] =
@@ -23,7 +25,7 @@ TEST(HasherTest, SHA256) {
   std::string strToHash{"Hello, World!"};
   std::vector<unsigned char> bytesToHash{strToHash.begin(), strToHash.end()};
 
-  auto hasher = std::make_unique<CppUtils::SHA256Hasher>();
+  auto hasher = std::make_unique<SHA256Hasher>();
   auto hash = hasher->Hash(bytesToHash);
 
   unsigned char preHashBytes[33] =

@@ -1,5 +1,7 @@
 #include "aes.h"
 
+namespace CppUtils {
+namespace Encryption {
 AES::AES(const AESKeyLength keyLength) {
   this->Nb = 4;
   switch (keyLength) {
@@ -492,3 +494,5 @@ std::vector<unsigned char> AES::DecryptCFB(std::vector<unsigned char> in,
   delete[] out;
   return v;
 }
+}  // namespace Encryption
+}  // namespace CppUtils

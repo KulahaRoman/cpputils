@@ -1,6 +1,7 @@
 #include "binaryarchive.h"
 
 namespace CppUtils {
+namespace Serialization {
 const std::size_t BinaryArchive::INITIAL_CAPACITY = 1024ull;
 const int32_t BinaryArchive::UNDEFINED_POSITION = -1;
 
@@ -160,4 +161,5 @@ int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
 
   return calculatedPosition;
 }
+}  // namespace Serialization
 }  // namespace CppUtils

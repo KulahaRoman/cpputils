@@ -4,6 +4,8 @@
 #include <mutex>
 
 namespace CppUtils {
+namespace Synchronization {
+
 class CountDownLatch {
  public:
   CountDownLatch(uint64_t size);
@@ -19,4 +21,5 @@ class CountDownLatch {
   std::mutex mx;
   std::condition_variable cv;
 };
+}  // namespace Synchronization
 }  // namespace CppUtils

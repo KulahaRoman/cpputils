@@ -5,6 +5,7 @@
 #include "binaryarchive.h"
 
 namespace CppUtils {
+namespace Serialization {
 // Represents interface that marks entity so it can be serialized/deserialized.
 // Each class which derives 'Serializable' must provide at least default
 // constructor, and must override all of pure virtual methods.
@@ -29,4 +30,5 @@ void Serializable::cacheSharedObject(const std::weak_ptr<T>& object) {
   auto erasedSharedPointer = std::static_pointer_cast<void>(object.lock());
   cachedSharedObjects.emplace(erasedSharedPointer);
 }
+}  // namespace Serialization
 }  // namespace CppUtils

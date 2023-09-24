@@ -2,6 +2,8 @@
 #include <cstring>
 #include <vector>
 
+namespace CppUtils {
+namespace Hashing {
 // NOT MINE
 
 // a small class for calculating MD5 hashes of strings or byte arrays
@@ -55,3 +57,5 @@ class MD5 {
   static inline void II(uint4& a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s,
                         uint4 ac);
 };
+}  // namespace Hashing
+}  // namespace CppUtils

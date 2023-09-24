@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace CppUtils {
+namespace Hashing {
 class Hasher {
  public:
   virtual std::vector<unsigned char> Hash(
@@ -10,4 +11,5 @@ class Hasher {
 
   virtual ~Hasher() {}
 };
+}  // namespace Hashing
 }  // namespace CppUtils

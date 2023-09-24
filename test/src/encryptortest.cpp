@@ -1,11 +1,13 @@
 #include <cpputils/aes256encryptor.h>
 #include <gtest/gtest.h>
 
+using namespace CppUtils::Encryption;
+
 TEST(EncryptorTest, AES256) {
   std::vector<unsigned char> key(32, 'A');
   std::vector<unsigned char> blockToEncrypt(16, 'B');
 
-  auto encryptor = std::make_unique<CppUtils::AES256Encryptor>(key);
+  auto encryptor = std::make_unique<AES256Encryptor>(key);
 
   auto encryptedBlock = encryptor->Encrypt(blockToEncrypt);
 

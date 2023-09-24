@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace CppUtils {
+namespace Serialization {
 class BinaryArchive {
  public:
 #ifdef BEGIN
@@ -88,4 +89,5 @@ class BinaryArchive {
   // Reading position.
   int32_t gpos;
 };
+}  // namespace Serialization
 }  // namespace CppUtils

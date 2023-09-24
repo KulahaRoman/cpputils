@@ -1,6 +1,7 @@
 #pragma once
 
 namespace CppUtils {
+namespace Serialization {
 class EndiannessProvider {
  public:
   enum class Endianness {
@@ -10,4 +11,5 @@ class EndiannessProvider {
 
   static Endianness GetSystemEndianness();
 };
+}  // namespace Serialization
 }  // namespace CppUtils

@@ -4,6 +4,9 @@
 /* system implementation headers */
 #include <cstdio>
 
+namespace CppUtils {
+namespace Hashing {
+
 // Constants for MD5Transform routine.
 #define S11 7
 #define S12 12
@@ -277,3 +280,5 @@ std::vector<unsigned char> MD5::result(const std::vector<unsigned char>& data) {
   finalize();
   return std::vector<unsigned char>(digest, digest + sizeof(digest));
 }
+}  // namespace Hashing
+}  // namespace CppUtils

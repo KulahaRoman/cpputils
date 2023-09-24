@@ -20,6 +20,7 @@
 #include "serializable.h"
 
 namespace CppUtils {
+namespace Serialization {
 // Represents a singletone class that does mostly all job of serialization.
 // Currently supports integral types, enum types, STL strings, several
 // containers and custom Serializable class. Detects and prevents cyclic
@@ -884,4 +885,5 @@ class Serializer {
   static thread_local std::map<std::shared_ptr<void>, int> referenceMap;
   static thread_local std::map<int, std::shared_ptr<void>> reverseReferenceMap;
 };
+}  // namespace Serialization
 }  // namespace CppUtils
