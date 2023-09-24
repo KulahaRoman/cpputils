@@ -7,6 +7,7 @@
 #include <memory>
 #include <queue>
 #include <set>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -128,6 +129,21 @@ class Serializer {
   }
 
   template <class K, class V>
+  static void Serialize(const std::multimap<K, V>& multimap,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(multimap.size()), archive);
+
+      for (const auto& [key, value] : multimap) {
+        Serialize(key, archive);
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::multimap<K,V>.");
+    }
+  }
+
+  template <class K, class V>
   static void Serialize(const std::unordered_map<K, V>& umap,
                         BinaryArchive& archive) {
     try {
@@ -142,6 +158,22 @@ class Serializer {
     }
   }
 
+  template <class K, class V>
+  static void Serialize(const std::unordered_multimap<K, V>& umultimap,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(umultimap.size()), archive);
+
+      for (const auto& [key, value] : umultimap) {
+        Serialize(key, archive);
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error(
+          "Failed to serialize std::unordered_multimap<K,V>.");
+    }
+  }
+
   template <class T>
   static void Serialize(const std::set<T>& set, BinaryArchive& archive) {
     try {
@@ -152,6 +184,20 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::set<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::multiset<T>& multiset,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(multiset.size()), archive);
+
+      for (const auto& value : multiset) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::multiset<T>.");
     }
   }
 
@@ -170,6 +216,37 @@ class Serializer {
   }
 
   template <class T>
+  static void Serialize(const std::unordered_multiset<T>& umultiset,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(umultiset.size()), archive);
+
+      for (const auto& value : umultiset) {
+        Serialize(value, archive);
+      }
+    } catch (...) {
+      throw std::runtime_error(
+          "Failed to serialize std::unordered_multiset<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::stack<T>& stack, BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(stack.size()), archive);
+
+      auto stackCopy = stack;
+
+      while (!stackCopy.empty()) {
+        Serialize(stackCopy.top(), archive);
+        stackCopy.pop();
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::stack<T>.");
+    }
+  }
+
+  template <class T>
   static void Serialize(const std::queue<T>& queue, BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(queue.size()), archive);
@@ -182,6 +259,23 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::queue<T>.");
+    }
+  }
+
+  template <class T>
+  static void Serialize(const std::priority_queue<T>& pqueue,
+                        BinaryArchive& archive) {
+    try {
+      Serialize(static_cast<uint64_t>(pqueue.size()), archive);
+
+      auto pqueueCopy = pqueue;
+
+      while (!pqueueCopy.empty()) {
+        Serialize(pqueueCopy.top(), archive);
+        pqueueCopy.pop();
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to serialize std::priority_queue<T>.");
     }
   }
 
@@ -231,7 +325,6 @@ class Serializer {
       Serialize(size, archive);
 
       archive.SetWritePosition(currentArchivePosition);
-
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::forward_list<T>.");
     }
@@ -420,6 +513,28 @@ class Serializer {
   }
 
   template <class K, class V>
+  static void Deserialize(std::multimap<K, V>& multimap,
+                          BinaryArchive& archive) {
+    auto mapSize = 0ull;
+
+    try {
+      Deserialize(mapSize, archive);
+
+      for (auto i = 0ull; i < mapSize; i++) {
+        K&& key{};
+        V&& value{};
+
+        Deserialize(key, archive);
+        Deserialize(value, archive);
+
+        multimap.emplace(std::move(key), std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::multimap<K,V>.");
+    }
+  }
+
+  template <class K, class V>
   static void Deserialize(std::unordered_map<K, V>& umap,
                           BinaryArchive& archive) {
     auto mapSize = 0ull;
@@ -439,6 +554,29 @@ class Serializer {
     } catch (...) {
       throw std::runtime_error(
           "Failed to deserialize std::unordered_map<K,V>.");
+    }
+  }
+
+  template <class K, class V>
+  static void Deserialize(std::unordered_multimap<K, V>& umultimap,
+                          BinaryArchive& archive) {
+    auto mapSize = 0ull;
+
+    try {
+      Deserialize(mapSize, archive);
+
+      for (auto i = 0ull; i < mapSize; i++) {
+        K&& key{};
+        V&& value{};
+
+        Deserialize(key, archive);
+        Deserialize(value, archive);
+
+        umultimap.emplace(std::move(key), std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error(
+          "Failed to deserialize std::unordered_multimap<K,V>.");
     }
   }
 
@@ -462,6 +600,25 @@ class Serializer {
   }
 
   template <class T>
+  static void Deserialize(std::multiset<T>& multiset, BinaryArchive& archive) {
+    auto setSize = 0ull;
+
+    try {
+      Deserialize(setSize, archive);
+
+      for (auto i = 0ull; i < setSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        multiset.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::multiset<T>.");
+    }
+  }
+
+  template <class T>
   static void Deserialize(std::unordered_set<T>& uset, BinaryArchive& archive) {
     auto setSize = 0ull;
 
@@ -481,6 +638,53 @@ class Serializer {
   }
 
   template <class T>
+  static void Deserialize(std::unordered_multiset<T>& umultiset,
+                          BinaryArchive& archive) {
+    auto setSize = 0ull;
+
+    try {
+      Deserialize(setSize, archive);
+
+      for (auto i = 0ull; i < setSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        umultiset.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error(
+          "Failed to deserialize std::unordered_multiset<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::stack<T>& stack, BinaryArchive& archive) {
+    auto stackSize = 0ull;
+
+    std::stack<T> helper;
+
+    try {
+      Deserialize(stackSize, archive);
+
+      for (auto i = 0ull; i < stackSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        helper.emplace(std::move(value));
+      }
+
+      while (!helper.empty()) {
+        stack.emplace(helper.top());
+        helper.pop();
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::stack<T>.");
+    }
+  }
+
+  template <class T>
   static void Deserialize(std::queue<T>& queue, BinaryArchive& archive) {
     auto queueSize = 0ull;
 
@@ -496,6 +700,26 @@ class Serializer {
       }
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::queue<T>.");
+    }
+  }
+
+  template <class T>
+  static void Deserialize(std::priority_queue<T>& pqueue,
+                          BinaryArchive& archive) {
+    auto pqueueSize = 0ull;
+
+    try {
+      Deserialize(pqueueSize, archive);
+
+      for (auto i = 0ull; i < pqueueSize; i++) {
+        T&& value{};
+
+        Deserialize(value, archive);
+
+        pqueue.emplace(std::move(value));
+      }
+    } catch (...) {
+      throw std::runtime_error("Failed to deserialize std::priority_queue<T>.");
     }
   }
 

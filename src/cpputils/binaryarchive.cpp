@@ -140,10 +140,6 @@ int32_t BinaryArchive::calculateCurrentPosition(SeekType seekType,
                                                 SeekDirection seekDir) const {
   auto storageSize = data.size();
 
-  if (storageSize == 0) {
-    return 0;
-  }
-
   auto currentPosition = (seekType == SeekType::READ ? gpos : ppos);
   auto calculatedPosition = 0;
 

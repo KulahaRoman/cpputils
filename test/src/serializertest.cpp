@@ -82,6 +82,23 @@ TEST(SerilizerTest, Map) {
   ASSERT_TRUE(out == in);
 }
 
+TEST(SerilizerTest, MultiMap) {
+  std::multimap<int, std::string> out;
+  out.emplace(0, "Roman");
+  out.emplace(0, "James");
+  out.emplace(1, "Anton");
+  out.emplace(1, "John");
+  out.emplace(2, "Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::multimap<int, std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
 TEST(SerilizerTest, UnorderedMap) {
   std::unordered_map<int, std::string> out;
   out.emplace(0, "Roman");
@@ -92,6 +109,23 @@ TEST(SerilizerTest, UnorderedMap) {
   Serializer::Serialize(out, archive);
 
   std::unordered_map<int, std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, UnorderedMultiMap) {
+  std::unordered_multimap<int, std::string> out;
+  out.emplace(0, "Roman");
+  out.emplace(0, "James");
+  out.emplace(1, "Anton");
+  out.emplace(1, "John");
+  out.emplace(2, "Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::unordered_multimap<int, std::string> in;
   Serializer::Deserialize(in, archive);
 
   ASSERT_TRUE(out == in);
@@ -112,6 +146,23 @@ TEST(SerilizerTest, Set) {
   ASSERT_TRUE(out == in);
 }
 
+TEST(SerilizerTest, MultiSet) {
+  std::multiset<std::string> out;
+  out.emplace("Roman");
+  out.emplace("James");
+  out.emplace("Anton");
+  out.emplace("John");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::multiset<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
 TEST(SerilizerTest, UnorderedSet) {
   std::unordered_set<std::string> out;
   out.emplace("Roman");
@@ -122,6 +173,38 @@ TEST(SerilizerTest, UnorderedSet) {
   Serializer::Serialize(out, archive);
 
   std::unordered_set<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, UnorderedMultiSet) {
+  std::unordered_multiset<std::string> out;
+  out.emplace("Roman");
+  out.emplace("James");
+  out.emplace("Anton");
+  out.emplace("John");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::unordered_multiset<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, Stack) {
+  std::stack<std::string> out;
+  out.emplace("Roman");
+  out.emplace("Anton");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::stack<std::string> in;
   Serializer::Deserialize(in, archive);
 
   ASSERT_TRUE(out == in);
@@ -140,6 +223,31 @@ TEST(SerilizerTest, Queue) {
   Serializer::Deserialize(in, archive);
 
   ASSERT_TRUE(out == in);
+}
+
+TEST(SerilizerTest, PriorityQueue) {
+  std::priority_queue<std::string> out;
+  out.emplace("Roman");
+  out.emplace("Anton");
+  out.emplace("Ivan");
+
+  BinaryArchive archive;
+  Serializer::Serialize(out, archive);
+
+  std::priority_queue<std::string> in;
+  Serializer::Deserialize(in, archive);
+
+  ASSERT_TRUE(out.size() == in.size());
+
+  while (!in.empty()) {
+    auto outElem = out.top();
+    auto inElem = in.top();
+
+    out.pop();
+    in.pop();
+
+    ASSERT_TRUE(outElem == inElem);
+  }
 }
 
 TEST(SerilizerTest, Deque) {
@@ -209,15 +317,18 @@ TEST(SerilizerTest, Vector) {
 //         |              |
 //         .-<--Person--<-.
 
+unsigned int personConstructedCounter = 0;
+unsigned int personDestructedCounter = 0;
+
 class Person : public Serializable {
  public:
-  Person() { Logger::Information("Class Person constructed."); }
+  Person() { personConstructedCounter++; }
   Person(const std::string& name,
          const std::shared_ptr<Person>& bestie = nullptr)
       : name(name), bestie(bestie) {
-    Logger::Information("Class Person constructed with arguments ({}).", name);
+    personConstructedCounter++;
   }
-  ~Person() { Logger::Information("Class Person destructed."); }
+  ~Person() { personDestructedCounter++; }
 
   std::string GetName() const { return name; }
   void SetName(const std::string& name) { this->name = name; }
@@ -244,21 +355,25 @@ class Person : public Serializable {
 };
 
 TEST(SerializerTest, TwoFriendsCyclicReferences) {
-  auto first = std::make_shared<Person>("Roman");
-  auto second = std::make_shared<Person>("Anton");
+  {
+    auto first = std::make_shared<Person>("Roman");
+    auto second = std::make_shared<Person>("Anton");
 
-  first->SetBestie(second);
-  second->SetBestie(first);
+    first->SetBestie(second);
+    second->SetBestie(first);
 
-  BinaryArchive archive;
-  Serializer::Serialize(first, archive);
+    BinaryArchive archive;
+    Serializer::Serialize(first, archive);
 
-  auto person = std::shared_ptr<Person>();
-  Serializer::Deserialize(person, archive);
+    auto person = std::shared_ptr<Person>();
+    Serializer::Deserialize(person, archive);
 
-  ASSERT_STREQ(person->GetName().c_str(), first->GetName().c_str());
-  ASSERT_STREQ(person->GetBestie()->GetName().c_str(),
-               second->GetName().c_str());
+    ASSERT_STREQ(person->GetName().c_str(), first->GetName().c_str());
+    ASSERT_STREQ(person->GetBestie()->GetName().c_str(),
+                 second->GetName().c_str());
+  }
+
+  ASSERT_TRUE(personConstructedCounter == personDestructedCounter);
 }
 
 //       Objects hierarchy
@@ -270,15 +385,17 @@ TEST(SerializerTest, TwoFriendsCyclicReferences) {
 //            C   D   |
 //            |   |   |
 //            E-<-F-<-.
-//
+//            |
+//            G
 
-class E : public Serializable {
+unsigned int gConstructedCounter = 0;
+unsigned int gDestructedCounter = 0;
+
+class G : public Serializable {
  public:
-  E() : num(0) { Logger::Information("Class E constructed."); }
-  E(int num) : num(num) {
-    Logger::Information("Class E constructed with arguments.");
-  }
-  ~E() { Logger::Information("Class E destructed."); }
+  G() : num(0) { gConstructedCounter++; }
+  G(int num) : num(num) { gConstructedCounter++; }
+  ~G() { gDestructedCounter++; }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
@@ -294,13 +411,44 @@ class E : public Serializable {
   int num;
 };
 
+unsigned int eConstructedCounter = 0;
+unsigned int eDestructedCounter = 0;
+
+class E : public Serializable {
+ public:
+  E() : num(0) { eConstructedCounter++; }
+  E(int num, std::unique_ptr<G>&& g) : num(num), g(std::move(g)) {
+    eConstructedCounter++;
+  }
+  ~E() { eDestructedCounter++; }
+
+  void SetNumber(int num) { this->num = num; }
+  int GetNumber() const { return num; }
+
+  virtual void Serialize(BinaryArchive& archive) const override {
+    Serializer::Serialize(num, archive);
+    Serializer::Serialize(g, archive);
+  }
+  virtual void Deserialize(BinaryArchive& archive) override {
+    Serializer::Deserialize(num, archive);
+    Serializer::Deserialize(g, archive);
+  }
+
+ private:
+  int num;
+  std::unique_ptr<G> g;
+};
+
+unsigned int fConstructedCounter = 0;
+unsigned int fDestructedCounter = 0;
+
 class F : public Serializable {
  public:
-  F() : num(0) { Logger::Information("Class F constructed."); }
+  F() : num(0) { fConstructedCounter++; }
   F(int num, const std::shared_ptr<E>& e) : num(num), e(e) {
-    Logger::Information("Class F constructed with arguments.");
+    fConstructedCounter++;
   }
-  ~F() { Logger::Information("Class F destructed."); }
+  ~F() { fDestructedCounter++; }
 
   void SetNumber(int num) { this->num = num; }
   int GetNumber() const { return num; }
@@ -322,13 +470,14 @@ class F : public Serializable {
   std::shared_ptr<E> e;
 };
 
+unsigned int dConstructedCounter = 0;
+unsigned int dDestructedCounter = 0;
+
 class D : public Serializable {
  public:
-  D() { Logger::Information("Class D constructed."); }
-  D(const std::shared_ptr<F>& f) : f(f) {
-    Logger::Information("Class D constructed with arguments.");
-  }
-  ~D() { Logger::Information("Class D destructed."); }
+  D() { dConstructedCounter++; }
+  D(const std::shared_ptr<F>& f) : f(f) { dConstructedCounter++; }
+  ~D() { dDestructedCounter++; }
 
   void SetF(const std::shared_ptr<F>& f) { this->f = f; }
   std::shared_ptr<F> GetF() const { return f; }
@@ -344,13 +493,14 @@ class D : public Serializable {
   std::shared_ptr<F> f;
 };
 
+unsigned int cConstructedCounter = 0;
+unsigned int cDestructedCounter = 0;
+
 class C : public Serializable {
  public:
-  C() { Logger::Information("Class C constructed."); }
-  C(const std::shared_ptr<E>& e) : e(e) {
-    Logger::Information("Class C constructed with arguments.");
-  }
-  ~C() { Logger::Information("Class C destructed."); }
+  C() { cConstructedCounter++; }
+  C(const std::shared_ptr<E>& e) : e(e) { cConstructedCounter++; }
+  ~C() { cDestructedCounter++; }
 
   void SetE(const std::shared_ptr<E>& e) { this->e = e; }
   std::shared_ptr<E> GetE() const { return e; }
@@ -368,13 +518,16 @@ class C : public Serializable {
 
 class A;
 
+unsigned int bConstructedCounter = 0;
+unsigned int bDestructedCounter = 0;
+
 class B : public Serializable {
  public:
-  B() { Logger::Information("Class B constructed."); }
+  B() { bConstructedCounter++; }
   B(const std::shared_ptr<C>& c, const std::shared_ptr<D>& d) : c(c), d(d) {
-    Logger::Information("Class B constructed with arguments.");
+    bConstructedCounter++;
   }
-  ~B() { Logger::Information("Class B destructed."); }
+  ~B() { bDestructedCounter++; }
 
   void SetA(const std::shared_ptr<A>& a) { this->a = a; }
   std::shared_ptr<A> GetA() const { return a.lock(); }
@@ -402,13 +555,16 @@ class B : public Serializable {
   std::shared_ptr<D> d;
 };
 
+unsigned int aConstructedCounter = 0;
+unsigned int aDestructedCounter = 0;
+
 class A : public Serializable {
  public:
-  A() { Logger::Information("Class A constructed."); }
+  A() { aConstructedCounter++; }
   A(const std::shared_ptr<B>& b, const std::shared_ptr<F>& f) : b(b), f(f) {
-    Logger::Information("Class A constructed with arguments.");
+    aConstructedCounter++;
   }
-  ~A() { Logger::Information("Class A destructed."); }
+  ~A() { aDestructedCounter++; }
 
   void SetB(const std::shared_ptr<B>& b) { this->b = b; }
   std::shared_ptr<B> GetB() const { return b; }
@@ -431,26 +587,37 @@ class A : public Serializable {
 };
 
 TEST(SerializerTest, ComplicatedCyclicReferences) {
-  auto eOut = std::make_shared<E>(2);
-  auto fOut = std::make_shared<F>(1, eOut);
+  {
+    auto&& gOut = std::make_unique<G>(5);
+    auto eOut = std::make_shared<E>(2, std::move(gOut));
+    auto fOut = std::make_shared<F>(1, eOut);
 
-  auto cOut = std::make_shared<C>(eOut);
-  auto dOut = std::make_shared<D>(fOut);
+    auto cOut = std::make_shared<C>(eOut);
+    auto dOut = std::make_shared<D>(fOut);
 
-  auto bOut = std::make_shared<B>(cOut, dOut);
+    auto bOut = std::make_shared<B>(cOut, dOut);
 
-  auto aOut = std::make_shared<A>(bOut, fOut);
+    auto aOut = std::make_shared<A>(bOut, fOut);
 
-  bOut->SetA(aOut);
+    bOut->SetA(aOut);
 
-  BinaryArchive archive;
-  Serializer::Serialize(aOut, archive);
+    BinaryArchive archive;
+    Serializer::Serialize(aOut, archive);
 
-  auto aIn = std::shared_ptr<A>();
-  Serializer::Deserialize(aIn, archive);
+    auto aIn = std::shared_ptr<A>();
+    Serializer::Deserialize(aIn, archive);
 
-  ASSERT_EQ(aIn->GetB()->GetC()->GetE()->GetNumber(), eOut->GetNumber());
-  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetNumber(), fOut->GetNumber());
-  ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetE()->GetNumber(),
-            eOut->GetNumber());
+    ASSERT_EQ(aIn->GetB()->GetC()->GetE()->GetNumber(), eOut->GetNumber());
+    ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetNumber(), fOut->GetNumber());
+    ASSERT_EQ(aIn->GetB()->GetD()->GetF()->GetE()->GetNumber(),
+              eOut->GetNumber());
+  }
+
+  ASSERT_TRUE(aConstructedCounter == aDestructedCounter);
+  ASSERT_TRUE(bConstructedCounter == bDestructedCounter);
+  ASSERT_TRUE(cConstructedCounter == cDestructedCounter);
+  ASSERT_TRUE(dConstructedCounter == dDestructedCounter);
+  ASSERT_TRUE(eConstructedCounter == eDestructedCounter);
+  ASSERT_TRUE(fConstructedCounter == fDestructedCounter);
+  ASSERT_TRUE(gConstructedCounter == gDestructedCounter);
 }
