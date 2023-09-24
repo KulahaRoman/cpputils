@@ -111,7 +111,12 @@ Example:
 Logger::Warning("Something goes not as it should be: {}", reason);
 ```
 
-In general, `CppUtils::Logger` methods' parameters are same as in `spdlog` library, because `CppUtils::Logger` actually uses `spdlog` lib. 
+In general, `CppUtils::Logger` methods' parameters are same as in `spdlog` library, because `CppUtils::Logger` actually uses `spdlog` lib.
+`CppUtils::Logger` also provides methods `void Logger::ToggleConsole(bool enabled)` and `void ToggleFile(bool enabled, const std::string& fileName = {})` to configure Logger.
+
+WARNING: By default, `CppUtils::Logger` has disabled console and file logging. You should configure Logger in the start of application to select where should it log (console or file, or both, or nowhere).
+
+`CppUtils::Logger` is thread-safe.
 
 ## Files
 `CppUtils::Files` is a helper class that implements simple filesystem actions, such as directory creation, removing, existing check.
