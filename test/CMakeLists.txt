@@ -5,6 +5,7 @@ project(cpputils-test)
 set(CPPUTILS_TEST_SRC	main.cpp
 						src/binaryarchivetest.cpp
 						src/serializertest.cpp
+						src/hashertest.cpp
 )
 
 add_executable(${PROJECT_NAME} ${CPPUTILS_TEST_SRC})
