@@ -149,9 +149,18 @@ TEST(SerilizerTest, Set) {
 TEST(SerilizerTest, MultiSet) {
   std::multiset<std::string> out;
   out.emplace("Roman");
+  out.emplace("Roman");
+  out.emplace("Roman");
   out.emplace("James");
   out.emplace("Anton");
+  out.emplace("Anton");
+  out.emplace("Anton");
   out.emplace("John");
+  out.emplace("John");
+  out.emplace("John");
+  out.emplace("Ivan");
+  out.emplace("Ivan");
+  out.emplace("Ivan");
   out.emplace("Ivan");
 
   BinaryArchive archive;
@@ -181,9 +190,18 @@ TEST(SerilizerTest, UnorderedSet) {
 TEST(SerilizerTest, UnorderedMultiSet) {
   std::unordered_multiset<std::string> out;
   out.emplace("Roman");
+  out.emplace("Roman");
+  out.emplace("Roman");
   out.emplace("James");
   out.emplace("Anton");
+  out.emplace("Anton");
+  out.emplace("Anton");
   out.emplace("John");
+  out.emplace("John");
+  out.emplace("John");
+  out.emplace("Ivan");
+  out.emplace("Ivan");
+  out.emplace("Ivan");
   out.emplace("Ivan");
 
   BinaryArchive archive;
