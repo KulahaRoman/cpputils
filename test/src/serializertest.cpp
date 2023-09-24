@@ -391,7 +391,8 @@ TEST(SerializerTest, TwoFriendsCyclicReferences) {
                  second->GetName().c_str());
   }
 
-  ASSERT_TRUE(personConstructedCounter == personDestructedCounter);
+  ASSERT_TRUE((personConstructedCounter == personDestructedCounter) &&
+              personConstructedCounter > 1);
 }
 
 //       Objects hierarchy
@@ -631,11 +632,18 @@ TEST(SerializerTest, ComplicatedCyclicReferences) {
               eOut->GetNumber());
   }
 
-  ASSERT_TRUE(aConstructedCounter == aDestructedCounter);
-  ASSERT_TRUE(bConstructedCounter == bDestructedCounter);
-  ASSERT_TRUE(cConstructedCounter == cDestructedCounter);
-  ASSERT_TRUE(dConstructedCounter == dDestructedCounter);
-  ASSERT_TRUE(eConstructedCounter == eDestructedCounter);
-  ASSERT_TRUE(fConstructedCounter == fDestructedCounter);
-  ASSERT_TRUE(gConstructedCounter == gDestructedCounter);
+  ASSERT_TRUE((aConstructedCounter == aDestructedCounter) &&
+              aConstructedCounter > 1);
+  ASSERT_TRUE((bConstructedCounter == bDestructedCounter) &&
+              bConstructedCounter > 1);
+  ASSERT_TRUE((cConstructedCounter == cDestructedCounter) &&
+              cConstructedCounter > 1);
+  ASSERT_TRUE((dConstructedCounter == dDestructedCounter) &&
+              dConstructedCounter > 1);
+  ASSERT_TRUE((eConstructedCounter == eDestructedCounter) &&
+              eConstructedCounter > 1);
+  ASSERT_TRUE((fConstructedCounter == fDestructedCounter) &&
+              fConstructedCounter > 1);
+  ASSERT_TRUE((gConstructedCounter == gDestructedCounter) &&
+              gConstructedCounter > 1);
 }
