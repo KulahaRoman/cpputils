@@ -12,8 +12,8 @@ set(CPPUTILS_TEST_SRC	main.cpp
 
 add_executable(${PROJECT_NAME} ${CPPUTILS_TEST_SRC})
 
-target_link_libraries(${PROJECT_NAME} cpputils)
-target_link_libraries(${PROJECT_NAME} GTest::gtest)
+target_link_libraries(${PROJECT_NAME} PUBLIC cpputils)
+target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest)
 
 config_compiler_and_linker()
 
