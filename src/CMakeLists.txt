@@ -3,43 +3,41 @@ cmake_minimum_required(VERSION 3.8)
 project(cpputils)
 
 set(CPPUTILS_SRC
-			cpputils/files.cpp
-			cpputils/logger.cpp
-			cpputils/abstractencryptor.cpp
-			cpputils/aes256encryptor.cpp
-			cpputils/aes.cpp
-			cpputils/md5hasher.cpp
-			cpputils/md5.cpp
-			cpputils/sha256hasher.cpp
-			cpputils/sha256.cpp
-			cpputils/binaryarchive.cpp
-			cpputils/countdownlatch.cpp
-			cpputils/serializer.cpp
-			cpputils/endiannessprovider.cpp
+			${PROJECT_NAME}/files.cpp
+			${PROJECT_NAME}/logger.cpp
+			${PROJECT_NAME}/abstractencryptor.cpp
+			${PROJECT_NAME}/aes256encryptor.cpp
+			${PROJECT_NAME}/aes.cpp
+			${PROJECT_NAME}/md5hasher.cpp
+			${PROJECT_NAME}/md5.cpp
+			${PROJECT_NAME}/sha256hasher.cpp
+			${PROJECT_NAME}/sha256.cpp
+			${PROJECT_NAME}/binaryarchive.cpp
+			${PROJECT_NAME}/countdownlatch.cpp
+			${PROJECT_NAME}/serializer.cpp
+			${PROJECT_NAME}/endiannessprovider.cpp
 )
 
 set(CPPUTILS_HEADERS 
-			cpputils/encryptor.h			
-			cpputils/abstractencryptor.h
-			cpputils/aes256encryptor.h
-			cpputils/countdownlatch.h
-			cpputils/logger.h
-			cpputils/files.h
-			cpputils/hasher.h
-			cpputils/md5hasher.h
-			cpputils/sha256hasher.h
-			cpputils/binaryarchive.h
-			cpputils/serializable.h
-			cpputils/serializer.h
-			cpputils/threadpool.h
+			${PROJECT_NAME}/encryptor.h			
+			${PROJECT_NAME}/abstractencryptor.h
+			${PROJECT_NAME}/aes256encryptor.h
+			${PROJECT_NAME}/countdownlatch.h
+			${PROJECT_NAME}/logger.h
+			${PROJECT_NAME}/files.h
+			${PROJECT_NAME}/hasher.h
+			${PROJECT_NAME}/md5hasher.h
+			${PROJECT_NAME}/sha256hasher.h
+			${PROJECT_NAME}/binaryarchive.h
+			${PROJECT_NAME}/serializable.h
+			${PROJECT_NAME}/serializer.h
+			${PROJECT_NAME}/threadpool.h
 )
 
-if(NOT TARGET ${PROJECT_NAME})
-	add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
-	target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 
-	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-	install(FILES ${CPPUTILS_HEADERS} DESTINATION ${CPPUTILS_INSTALL_INCLUDE})
-	install(TARGETS ${PROJECT_NAME} DESTINATION ${CPPUTILS_INSTALL_LIB})
-endif()
+install(FILES ${CPPUTILS_HEADERS} DESTINATION ${CPPUTILS_INSTALL_INCLUDE})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CPPUTILS_INSTALL_LIB})
