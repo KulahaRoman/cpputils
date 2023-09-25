@@ -127,7 +127,7 @@ TEST(BinaryArchiveTest, WriteTextRead3BytesFromEndTwoTimes) {
   archive.SetReadPosition(3, BinaryArchive::SeekDirection::END);
   std::string outStr(3, '0');
   archive.Read(reinterpret_cast<unsigned char*>(outStr.data()), 3);
-  ASSERT_STREQ(outStr.data(), "890");
+  ASSERT_STREQ(outStr.c_str(), "890");
 
   archive.SetWritePosition(2, BinaryArchive::SeekDirection::END);
 
@@ -135,7 +135,7 @@ TEST(BinaryArchiveTest, WriteTextRead3BytesFromEndTwoTimes) {
                 inStr.size());
   archive.SetReadPosition(3, BinaryArchive::SeekDirection::END);
   archive.Read(reinterpret_cast<unsigned char*>(outStr.data()), 3);
-  ASSERT_STREQ(outStr.data(), "890");
+  ASSERT_STREQ(outStr.c_str(), "890");
 }
 
 TEST(BinaryArchiveTest,
@@ -147,13 +147,13 @@ TEST(BinaryArchiveTest,
   archive.SetReadPosition(5, BinaryArchive::SeekDirection::END);
   std::string outStr(2, '0');
   archive.Read(reinterpret_cast<unsigned char*>(outStr.data()), 2);
-  ASSERT_STREQ(outStr.data(), "67");
+  ASSERT_STREQ(outStr.c_str(), "67");
 
   archive.Write(reinterpret_cast<const unsigned char*>(inStr.data()),
                 inStr.size());
   archive.SetReadPosition(3, BinaryArchive::SeekDirection::END);
   archive.Read(reinterpret_cast<unsigned char*>(outStr.data()), 3);
-  ASSERT_STREQ(outStr.data(), "890");
+  ASSERT_STREQ(outStr.c_str(), "890");
 }
 
 TEST(BinaryArchiveTest, EmptyArchiveSeekReadDirOneByteFromBegin) {
