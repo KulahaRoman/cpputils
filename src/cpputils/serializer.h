@@ -115,8 +115,9 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Serialize(const std::map<K, V>& map, BinaryArchive& archive) {
+  template <class K, class V, class Compare, class Allocator>
+  static void Serialize(const std::map<K, V, Compare, Allocator>& map,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(map.size()), archive);
 
@@ -129,8 +130,8 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Serialize(const std::multimap<K, V>& multimap,
+  template <class K, class V, class Compare, class Allocator>
+  static void Serialize(const std::multimap<K, V, Compare, Allocator>& multimap,
                         BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(multimap.size()), archive);
@@ -144,9 +145,10 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Serialize(const std::unordered_map<K, V>& umap,
-                        BinaryArchive& archive) {
+  template <class K, class V, class Hash, class KeyEqual, class Allocator>
+  static void Serialize(
+      const std::unordered_map<K, V, Hash, KeyEqual, Allocator>& umap,
+      BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(umap.size()), archive);
 
@@ -159,9 +161,10 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Serialize(const std::unordered_multimap<K, V>& umultimap,
-                        BinaryArchive& archive) {
+  template <class K, class V, class Hash, class KeyEqual, class Allocator>
+  static void Serialize(
+      const std::unordered_multimap<K, V, Hash, KeyEqual, Allocator>& umultimap,
+      BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(umultimap.size()), archive);
 
@@ -175,8 +178,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::set<T>& set, BinaryArchive& archive) {
+  template <class T, class Compare, class Allocator>
+  static void Serialize(const std::set<T, Compare, Allocator>& set,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(set.size()), archive);
 
@@ -188,8 +192,8 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::multiset<T>& multiset,
+  template <class T, class Compare, class Allocator>
+  static void Serialize(const std::multiset<T, Compare, Allocator>& multiset,
                         BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(multiset.size()), archive);
@@ -202,9 +206,10 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::unordered_set<T>& uset,
-                        BinaryArchive& archive) {
+  template <class T, class Hash, class KeyEqual, class Allocator>
+  static void Serialize(
+      const std::unordered_set<T, Hash, KeyEqual, Allocator>& uset,
+      BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(uset.size()), archive);
 
@@ -216,9 +221,10 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::unordered_multiset<T>& umultiset,
-                        BinaryArchive& archive) {
+  template <class T, class Hash, class KeyEqual, class Allocator>
+  static void Serialize(
+      const std::unordered_multiset<T, Hash, KeyEqual, Allocator>& umultiset,
+      BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(umultiset.size()), archive);
 
@@ -231,8 +237,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::stack<T>& stack, BinaryArchive& archive) {
+  template <class T, class Container>
+  static void Serialize(const std::stack<T, Container>& stack,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(stack.size()), archive);
 
@@ -247,8 +254,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::queue<T>& queue, BinaryArchive& archive) {
+  template <class T, class Container>
+  static void Serialize(const std::queue<T, Container>& queue,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(queue.size()), archive);
 
@@ -263,9 +271,10 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::priority_queue<T>& pqueue,
-                        BinaryArchive& archive) {
+  template <class T, class Container, class Compare>
+  static void Serialize(
+      const std::priority_queue<T, Container, Compare>& pqueue,
+      BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(pqueue.size()), archive);
 
@@ -280,8 +289,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::deque<T>& deque, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Serialize(const std::deque<T, Allocator>& deque,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(deque.size()), archive);
 
@@ -293,8 +303,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::list<T>& list, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Serialize(const std::list<T, Allocator>& list,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(list.size()), archive);
 
@@ -306,8 +317,8 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::forward_list<T>& flist,
+  template <class T, class Allocator>
+  static void Serialize(const std::forward_list<T, Allocator>& flist,
                         BinaryArchive& archive) {
     try {
       auto initialArchivePosition = archive.GetWritePosition();
@@ -331,8 +342,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::vector<T>& vector, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Serialize(const std::vector<T, Allocator>& vector,
+                        BinaryArchive& archive) {
     try {
       Serialize(static_cast<uint64_t>(vector.size()), archive);
 
@@ -344,8 +356,8 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Serialize(const std::unique_ptr<T>& pointer,
+  template <class T, class Deleter>
+  static void Serialize(const std::unique_ptr<T, Deleter>& pointer,
                         BinaryArchive& archive) {
     auto pointerState = pointer ? PointerState::VALID : PointerState::INVALID;
     Serialize(pointerState, archive);
@@ -492,8 +504,9 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Deserialize(std::map<K, V>& map, BinaryArchive& archive) {
+  template <class K, class V, class Compare, class Allocator>
+  static void Deserialize(std::map<K, V, Compare, Allocator>& map,
+                          BinaryArchive& archive) {
     auto mapSize = 0ull;
 
     try {
@@ -513,8 +526,8 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Deserialize(std::multimap<K, V>& multimap,
+  template <class K, class V, class Compare, class Allocator>
+  static void Deserialize(std::multimap<K, V, Compare, Allocator>& multimap,
                           BinaryArchive& archive) {
     auto mapSize = 0ull;
 
@@ -535,9 +548,10 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Deserialize(std::unordered_map<K, V>& umap,
-                          BinaryArchive& archive) {
+  template <class K, class V, class Hash, class KeyEqual, class Allocator>
+  static void Deserialize(
+      std::unordered_map<K, V, Hash, KeyEqual, Allocator>& umap,
+      BinaryArchive& archive) {
     auto mapSize = 0ull;
 
     try {
@@ -558,9 +572,10 @@ class Serializer {
     }
   }
 
-  template <class K, class V>
-  static void Deserialize(std::unordered_multimap<K, V>& umultimap,
-                          BinaryArchive& archive) {
+  template <class K, class V, class Hash, class KeyEqual, class Allocator>
+  static void Deserialize(
+      std::unordered_multimap<K, V, Hash, KeyEqual, Allocator>& umultimap,
+      BinaryArchive& archive) {
     auto mapSize = 0ull;
 
     try {
@@ -581,8 +596,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::set<T>& set, BinaryArchive& archive) {
+  template <class T, class Compare, class Allocator>
+  static void Deserialize(std::set<T, Compare, Allocator>& set,
+                          BinaryArchive& archive) {
     auto setSize = 0ull;
 
     try {
@@ -600,8 +616,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::multiset<T>& multiset, BinaryArchive& archive) {
+  template <class T, class Compare, class Allocator>
+  static void Deserialize(std::multiset<T, Compare, Allocator>& multiset,
+                          BinaryArchive& archive) {
     auto setSize = 0ull;
 
     try {
@@ -619,8 +636,10 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::unordered_set<T>& uset, BinaryArchive& archive) {
+  template <class T, class Hash, class KeyEqual, class Allocator>
+  static void Deserialize(
+      std::unordered_set<T, Hash, KeyEqual, Allocator>& uset,
+      BinaryArchive& archive) {
     auto setSize = 0ull;
 
     try {
@@ -638,9 +657,10 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::unordered_multiset<T>& umultiset,
-                          BinaryArchive& archive) {
+  template <class T, class Hash, class KeyEqual, class Allocator>
+  static void Deserialize(
+      std::unordered_multiset<T, Hash, KeyEqual, Allocator>& umultiset,
+      BinaryArchive& archive) {
     auto setSize = 0ull;
 
     try {
@@ -659,8 +679,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::stack<T>& stack, BinaryArchive& archive) {
+  template <class T, class Container>
+  static void Deserialize(std::stack<T, Container>& stack,
+                          BinaryArchive& archive) {
     auto stackSize = 0ull;
 
     std::stack<T> helper;
@@ -685,8 +706,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::queue<T>& queue, BinaryArchive& archive) {
+  template <class T, class Container>
+  static void Deserialize(std::queue<T, Container>& queue,
+                          BinaryArchive& archive) {
     auto queueSize = 0ull;
 
     try {
@@ -704,8 +726,8 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::priority_queue<T>& pqueue,
+  template <class T, class Container, class Compare>
+  static void Deserialize(std::priority_queue<T, Container, Compare>& pqueue,
                           BinaryArchive& archive) {
     auto pqueueSize = 0ull;
 
@@ -724,8 +746,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::deque<T>& deque, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Deserialize(std::deque<T, Allocator>& deque,
+                          BinaryArchive& archive) {
     auto dequeSize = 0ull;
 
     try {
@@ -743,8 +766,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::list<T>& list, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Deserialize(std::list<T, Allocator>& list,
+                          BinaryArchive& archive) {
     auto listSize = 0ull;
 
     try {
@@ -762,8 +786,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::forward_list<T>& flist, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Deserialize(std::forward_list<T, Allocator>& flist,
+                          BinaryArchive& archive) {
     auto listSize = 0ull;
 
     try {
@@ -784,8 +809,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::vector<T>& vector, BinaryArchive& archive) {
+  template <class T, class Allocator>
+  static void Deserialize(std::vector<T, Allocator>& vector,
+                          BinaryArchive& archive) {
     auto vectorSize = 0ull;
 
     try {
@@ -803,8 +829,9 @@ class Serializer {
     }
   }
 
-  template <class T>
-  static void Deserialize(std::unique_ptr<T>& pointer, BinaryArchive& archive) {
+  template <class T, class Deleter>
+  static void Deserialize(std::unique_ptr<T, Deleter>& pointer,
+                          BinaryArchive& archive) {
     auto pointerState = PointerState::NONE;
     Deserialize(pointerState, archive);
 
