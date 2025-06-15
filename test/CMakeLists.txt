@@ -7,7 +7,8 @@ set(CPPUTILS_TEST_SRC	main.cpp
 						src/serializertest.cpp
 						src/hashertest.cpp
 						src/encryptortest.cpp
-						#src/loggertest.cpp
+						src/loggertest.cpp
+						src/executortest.cpp
 )
 
 add_executable(${PROJECT_NAME} ${CPPUTILS_TEST_SRC})

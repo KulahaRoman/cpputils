@@ -16,6 +16,8 @@ set(CPPUTILS_SRC
 			${PROJECT_NAME}/countdownlatch.cpp
 			${PROJECT_NAME}/serializer.cpp
 			${PROJECT_NAME}/endiannessprovider.cpp
+			${PROJECT_NAME}/threadpoolexecutor.cpp
+			${PROJECT_NAME}/threadpertaskexecutor.cpp
 )
 
 set(CPPUTILS_HEADERS 
@@ -31,7 +33,9 @@ set(CPPUTILS_HEADERS
 			${PROJECT_NAME}/binaryarchive.h
 			${PROJECT_NAME}/serializable.h
 			${PROJECT_NAME}/serializer.h
-			${PROJECT_NAME}/threadpool.h
+			${PROJECT_NAME}/executor.h
+			${PROJECT_NAME}/threadpoolexecutor.h
+			${PROJECT_NAME}/threadpertaskexecutor.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${CPPUTILS_SRC})
