@@ -16,7 +16,7 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
     }
 
     if (static_cast<std::size_t>(gpos) + size > this->data.size()) {
-      throw std::runtime_error("Reading position out of bound.");
+      throw std::runtime_error("reading position out of bound");
     }
 
     auto beginPosition = this->data.begin() + gpos;
@@ -26,7 +26,7 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
 
     gpos += static_cast<int32_t>(size);
   } catch (...) {
-    throw std::runtime_error("Failed to read data from internal storage.");
+    throw std::runtime_error("failed to read data from internal storage");
   }
 }
 
@@ -46,7 +46,7 @@ void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
 
     ppos += static_cast<int32_t>(size);
   } catch (...) {
-    throw std::runtime_error("Failed to write data to internal storage.");
+    throw std::runtime_error("failed to write data to internal storage");
   }
 }
 
@@ -59,7 +59,7 @@ void BinaryArchive::SetReadPosition(int32_t pos, SeekDirection seekDir) {
 
   if (storageSize == 0) {
     throw std::runtime_error(
-        "Failed to set new reading position: storage is empty.");
+        "failed to set new reading position: storage is empty");
   }
 
   auto newPosition = static_cast<std::size_t>(
@@ -67,7 +67,7 @@ void BinaryArchive::SetReadPosition(int32_t pos, SeekDirection seekDir) {
 
   if (newPosition < 0 || newPosition >= storageSize) {
     throw std::runtime_error(
-        "Failed to set new reading position: out of bounds.");
+        "failed to set new reading position: out of bounds");
   }
 
   gpos = static_cast<int32_t>(newPosition);
@@ -82,7 +82,7 @@ void BinaryArchive::SetWritePosition(int32_t pos, SeekDirection seekDir) {
 
   if (storageSize == 0) {
     throw std::runtime_error(
-        "Failed to set new writing position: storage is empty.");
+        "failed to set new writing position: storage is empty");
   }
 
   auto newPosition = static_cast<std::size_t>(
@@ -90,7 +90,7 @@ void BinaryArchive::SetWritePosition(int32_t pos, SeekDirection seekDir) {
 
   if (newPosition < 0 || newPosition > storageSize) {
     throw std::runtime_error(
-        "Failed to set new writing position: out of bounds.");
+        "failed to set new writing position: out of bounds");
   }
 
   ppos = static_cast<int32_t>(newPosition);
@@ -100,7 +100,7 @@ void BinaryArchive::Clear() {
   try {
     data.clear();
   } catch (...) {
-    throw std::runtime_error("Failed to clear internal storage.");
+    throw std::runtime_error("failed to clear internal storage");
   }
 
   gpos = 0;

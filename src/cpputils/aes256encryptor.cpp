@@ -12,7 +12,7 @@ AES256Encryptor::AES256Encryptor(const std::vector<unsigned char>& key)
 std::vector<unsigned char> AES256Encryptor::Encrypt(
     const std::vector<unsigned char>& decryptedData) {
   if (decryptedData.size() != BLOCK_SIZE) {
-    throw std::runtime_error("Invalid block size.");
+    throw std::runtime_error("invalid block size");
   }
   return aes.EncryptECB(decryptedData, key);
 }
@@ -20,7 +20,7 @@ std::vector<unsigned char> AES256Encryptor::Encrypt(
 std::vector<unsigned char> AES256Encryptor::Decrypt(
     const std::vector<unsigned char>& encryptedData) {
   if (encryptedData.size() != BLOCK_SIZE) {
-    throw std::runtime_error("Invalid block size.");
+    throw std::runtime_error("invalid block size");
   }
   return aes.DecryptECB(encryptedData, key);
 }

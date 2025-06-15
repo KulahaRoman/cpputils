@@ -6,7 +6,7 @@ AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
                                      const std::vector<unsigned char>& key)
     : blockSize(blockSize), keySize(keySize), key(key) {
   if (key.size() != keySize) {
-    throw std::runtime_error("Invalid key length.");
+    throw std::runtime_error("invalid key length");
   }
 }
 

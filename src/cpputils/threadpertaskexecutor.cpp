@@ -23,7 +23,7 @@ void ThreadPerTaskExecutor::Execute(const Task& task) {
     try {
       task();
     } catch (const std::exception& ex) {
-      Logger::Error("ThreadPool caught exception: {}", ex.what());
+      Logger::Warning("ThreadPerTaskExecutor caught exception: {}", ex.what());
     }
 
     {

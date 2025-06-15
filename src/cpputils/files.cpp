@@ -8,7 +8,7 @@ void Files::CreateFile(const fs::path& path) {
     fout.open(path, std::ios_base::out);
     fout.close();
   } catch (...) {
-    throw std::runtime_error("Failed to create file: " + path.string());
+    throw std::runtime_error("failed to create file: " + path.string());
   }
 }
 
@@ -19,7 +19,7 @@ void Files::CreateDirectory(const fs::path& path) {
     try {
       fs::create_directories(absolutePath);
     } catch (...) {
-      throw std::runtime_error("Failed to create directory: " +
+      throw std::runtime_error("failed to create directory: " +
                                absolutePath.string());
     }
   }
@@ -29,7 +29,7 @@ void Files::Remove(const fs::path& path) {
   try {
     fs::remove_all(path);
   } catch (...) {
-    throw std::runtime_error("Failed to remove file/directory: " +
+    throw std::runtime_error("failed to remove file/directory: " +
                              path.string());
   }
 }
@@ -42,7 +42,7 @@ void Files::Copy(const fs::path& sourcePath, const fs::path& targetPath) {
 
     fs::copy(sourcePath, targetPath, options);
   } catch (...) {
-    throw std::runtime_error("Failed to copy file/directory: " +
+    throw std::runtime_error("failed to copy file/directory: " +
                              sourcePath.string());
   }
 }
@@ -51,7 +51,7 @@ bool Files::Exists(const fs::path& path) {
   try {
     return fs::exists(path);
   } catch (...) {
-    throw std::runtime_error("Failed to check file/directory existence: " +
+    throw std::runtime_error("failed to check file/directory existence: " +
                              path.string());
   }
   return false;
@@ -61,7 +61,7 @@ uint64_t Files::GetSize(const fs::path& path) {
   try {
     return fs::file_size(path);
   } catch (...) {
-    throw std::runtime_error("Failed to get file/directory size: " +
+    throw std::runtime_error("failed to get file/directory size: " +
                              path.string());
   }
   return 0;

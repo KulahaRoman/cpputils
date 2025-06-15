@@ -52,8 +52,7 @@ void ThreadPoolExecutor::threadFunc() {
     try {
       task();
     } catch (const std::exception& ex) {
-      Logger::Error("ThreadPool caught exception: {}", ex.what());
-      continue;
+      Logger::Error("ThreadPoolExecutor caught exception: {}", ex.what());
     }
   }
 }
