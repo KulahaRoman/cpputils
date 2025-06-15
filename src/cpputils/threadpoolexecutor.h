@@ -14,7 +14,7 @@ namespace CppUtils {
 namespace Execution {
 class ThreadPoolExecutor : public Executor {
  public:
-  ThreadPoolExecutor(uint32_t nThreads);
+  ThreadPoolExecutor(uint32_t nThreads = std::thread::hardware_concurrency());
   ~ThreadPoolExecutor();
 
   void Execute(const Task& task) override;

@@ -2,9 +2,7 @@
 
 namespace CppUtils {
 namespace Execution {
-ThreadPoolExecutor::ThreadPoolExecutor(
-    uint32_t nThreads = std::thread::hardware_concurrency())
-    : running(true) {
+ThreadPoolExecutor::ThreadPoolExecutor(uint32_t nThreads) : running(true) {
   for (auto i = 0u; i < nThreads; i++) {
     workers.emplace_back(std::thread(&ThreadPoolExecutor::threadFunc, this));
   }
