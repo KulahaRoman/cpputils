@@ -3,6 +3,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <mutex>
 
 namespace CppUtils {
@@ -42,6 +43,8 @@ class Logger {
     }
   }
 
+  static void SetLevel(const std::string& level);
+
   template <typename... Args>
   static void Information(fmt::format_string<Args...> fmt, Args&&... args) {
     auto& inst = getInstance();
@@ -54,6 +57,22 @@ class Logger {
 
     if (inst.fileLogging) {
       inst.file->info(fmt, std::forward<Args>(args)...);
+      inst.file->flush();
+    }
+  }
+
+  template <typename... Args>
+  static void Debug(fmt::format_string<Args...> fmt, Args&&... args) {
+    auto& inst = getInstance();
+    auto lock = std::unique_lock<std::mutex>(inst.mx);
+
+    if (inst.consoleLogging) {
+      inst.console->debug(fmt, std::forward<Args>(args)...);
+      inst.console->flush();
+    }
+
+    if (inst.fileLogging) {
+      inst.file->debug(fmt, std::forward<Args>(args)...);
       inst.file->flush();
     }
   }

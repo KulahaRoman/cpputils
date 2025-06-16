@@ -6,9 +6,11 @@ using namespace CppUtils;
 
 TEST(LoggerTest, LogToConsole) {
   Logger::ToggleConsole(true);
+  Logger::SetLevel("debug");
 
   auto log = [] {
     Logger::Information("Information log.");
+    Logger::Debug("Debug log.");
     Logger::Warning("Warning log.");
     Logger::Error("Error log.");
     Logger::Critical("Critical log.");
@@ -20,9 +22,11 @@ TEST(LoggerTest, LogToConsole) {
 TEST(LoggerTest, LogNeitherConsoleNorFile) {
   Logger::ToggleConsole(false);
   Logger::ToggleFile(false);
+  Logger::SetLevel("debug");
 
   auto log = [] {
     Logger::Information("Information log.");
+    Logger::Debug("Debug log.");
     Logger::Warning("Warning log.");
     Logger::Error("Error log.");
     Logger::Critical("Critical log.");
@@ -34,9 +38,11 @@ TEST(LoggerTest, LogNeitherConsoleNorFile) {
 TEST(LoggerTest, NotLogToConsoleButToFile) {
   Logger::ToggleConsole(false);
   Logger::ToggleFile(true, "logs.txt");
+  Logger::SetLevel("debug");
 
   auto log = [] {
     Logger::Information("Information log.");
+    Logger::Debug("Debug log.");
     Logger::Warning("Warning log.");
     Logger::Error("Error log.");
     Logger::Critical("Critical log.");
@@ -48,9 +54,11 @@ TEST(LoggerTest, NotLogToConsoleButToFile) {
 TEST(LoggerTest, LogToConsoleAndToFile) {
   Logger::ToggleConsole(true);
   Logger::ToggleFile(true, "logs.txt");
+  Logger::SetLevel("debug");
 
   auto log = [] {
     Logger::Information("Information log.");
+    Logger::Debug("Debug log.");
     Logger::Warning("Warning log.");
     Logger::Error("Error log.");
     Logger::Critical("Critical log.");
@@ -62,6 +70,7 @@ TEST(LoggerTest, LogToConsoleAndToFile) {
 TEST(LoggerTest, MultithreadedLogging) {
   Logger::ToggleConsole(false);
   Logger::ToggleFile(true, "logs.txt");
+  Logger::SetLevel("debug");
 
   auto latch = std::make_shared<Synchronization::CountDownLatch>(2);
 
