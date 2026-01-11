@@ -2,8 +2,8 @@
 
 namespace CppUtils {
 namespace Encryption {
-const uint64_t AES256Encryptor::BLOCK_SIZE = 16ull;
-const uint64_t AES256Encryptor::KEY_SIZE = 32ull;
+const std::size_t AES256Encryptor::BLOCK_SIZE = 16ull;
+const std::size_t AES256Encryptor::KEY_SIZE = 32ull;
 
 AES256Encryptor::AES256Encryptor(const std::vector<unsigned char>& key)
     : AbstractEncryptor(BLOCK_SIZE, KEY_SIZE, key),

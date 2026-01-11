@@ -16,8 +16,8 @@ class AES256Encryptor : public AbstractEncryptor {
       const std::vector<unsigned char>& encryptedData) override;
 
  private:
-  static const uint64_t BLOCK_SIZE;
-  static const uint64_t KEY_SIZE;
+  static const std::size_t BLOCK_SIZE;
+  static const std::size_t KEY_SIZE;
 
   AES aes;
 };

@@ -2,7 +2,7 @@
 
 namespace CppUtils {
 namespace Encryption {
-AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
+AbstractEncryptor::AbstractEncryptor(std::size_t blockSize, std::size_t keySize,
                                      const std::vector<unsigned char>& key)
     : blockSize(blockSize), keySize(keySize), key(key) {
   if (key.size() != keySize) {
@@ -10,8 +10,8 @@ AbstractEncryptor::AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
   }
 }
 
-uint64_t AbstractEncryptor::GetBlockSize() const { return blockSize; }
+std::size_t AbstractEncryptor::GetBlockSize() const { return blockSize; }
 
-uint64_t AbstractEncryptor::GetKeySize() const { return keySize; }
+std::size_t AbstractEncryptor::GetKeySize() const { return keySize; }
 }  // namespace Encryption
 }  // namespace CppUtils

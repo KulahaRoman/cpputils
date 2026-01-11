@@ -7,18 +7,18 @@ namespace CppUtils {
 namespace Encryption {
 class AbstractEncryptor : public Encryptor {
  public:
-  AbstractEncryptor(uint64_t blockSize, uint64_t keySize,
+  AbstractEncryptor(std::size_t blockSize, std::size_t keySize,
                     const std::vector<unsigned char>& key);
 
-  uint64_t GetBlockSize() const override;
-  uint64_t GetKeySize() const override;
+  std::size_t GetBlockSize() const override;
+  std::size_t GetKeySize() const override;
 
  protected:
   const std::vector<unsigned char> key;
 
  private:
-  const uint64_t blockSize;
-  const uint64_t keySize;
+  const std::size_t blockSize;
+  const std::size_t keySize;
 };
 }  // namespace Encryption
 }  // namespace CppUtils
