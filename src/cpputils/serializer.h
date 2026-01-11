@@ -41,8 +41,7 @@ class Serializer {
         temp = value;
       }
 
-      archive.Write(reinterpret_cast<const unsigned char*>(&temp),
-                    sizeof(temp));
+      archive.Write(reinterpret_cast<const char*>(&temp), sizeof(temp));
     } catch (...) {
       throw std::runtime_error("Failed to serialize integral type value.");
     }
@@ -65,8 +64,7 @@ class Serializer {
 
       Serialize(strSizeInBytes, archive);
 
-      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
-                    static_cast<std::size_t>(strSizeInBytes));
+      archive.Write(str.data(), static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::string.");
     }
@@ -79,7 +77,7 @@ class Serializer {
 
       Serialize(strSizeInBytes, archive);
 
-      archive.Write(reinterpret_cast<const unsigned char*>(wstr.data()),
+      archive.Write(reinterpret_cast<const char*>(wstr.data()),
                     static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to serialize std::wstring.");
@@ -412,7 +410,7 @@ class Serializer {
     try {
       T temp{};
 
-      archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
+      archive.Read(reinterpret_cast<char*>(&temp), sizeof(temp));
 
       // let's assume that network endian is big
       if (EndiannessProvider::GetSystemEndianness() ==
@@ -445,8 +443,7 @@ class Serializer {
 
       str.resize(static_cast<std::size_t>(strSizeInBytes));
 
-      archive.Read(reinterpret_cast<unsigned char*>(str.data()),
-                   static_cast<std::size_t>(strSizeInBytes));
+      archive.Read(str.data(), static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::string.");
     }
@@ -460,7 +457,7 @@ class Serializer {
 
       wstr.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
 
-      archive.Read(reinterpret_cast<unsigned char*>(wstr.data()),
+      archive.Read(reinterpret_cast<char*>(wstr.data()),
                    static_cast<std::size_t>(strSizeInBytes));
     } catch (...) {
       throw std::runtime_error("Failed to deserialize std::wstring.");

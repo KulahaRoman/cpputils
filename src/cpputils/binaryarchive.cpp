@@ -9,7 +9,7 @@ BinaryArchive::BinaryArchive(std::size_t capacity) : ppos(0), gpos(0) {
   data.reserve(capacity);
 }
 
-void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
+void BinaryArchive::Read(char* const data, std::size_t size) {
   try {
     if (size == 0) {
       return;
@@ -30,7 +30,7 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
   }
 }
 
-void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
+void BinaryArchive::Write(const char* const data, std::size_t size) {
   try {
     if (size == 0) {
       return;
@@ -109,9 +109,7 @@ void BinaryArchive::Clear() {
 
 std::size_t BinaryArchive::GetSize() const { return data.size(); }
 
-const unsigned char* BinaryArchive::GetDataPointer() const {
-  return data.data();
-}
+const char* BinaryArchive::GetDataPointer() const { return data.data(); }
 
 int32_t BinaryArchive::calculateNewPosition(int32_t pos, SeekType seekType,
                                             SeekDirection seekDir) const {
