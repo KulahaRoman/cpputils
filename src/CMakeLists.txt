@@ -14,7 +14,6 @@ set(CPPUTILS_SRC
 			${PROJECT_NAME}/sha256.cpp
 			${PROJECT_NAME}/binaryarchive.cpp
 			${PROJECT_NAME}/countdownlatch.cpp
-			${PROJECT_NAME}/serializer.cpp
 			${PROJECT_NAME}/endiannessprovider.cpp
 			${PROJECT_NAME}/threadpoolexecutor.cpp
 			${PROJECT_NAME}/threadpertaskexecutor.cpp
