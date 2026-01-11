@@ -29,7 +29,7 @@ class Serializer {
   template <class T>
   static void Serialize(
       const T value, BinaryArchive& archive,
-      std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
+      const std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
       // let's assume that network endian is big
       T temp{};
@@ -52,7 +52,7 @@ class Serializer {
   template <class T>
   static void Serialize(
       const T value, BinaryArchive& archive,
-      std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
+      const std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
     try {
       Serialize(static_cast<std::underlying_type_t<T>>(value), archive);
     } catch (const std::exception& e) {
@@ -429,7 +429,7 @@ class Serializer {
   template <class T>
   static void Deserialize(
       T& value, BinaryArchive& archive,
-      std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
+      const std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
       T temp{};
 
@@ -451,7 +451,7 @@ class Serializer {
   template <class T>
   static void Deserialize(
       T& value, BinaryArchive& archive,
-      std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
+      const std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
     try {
       Deserialize(reinterpret_cast<std::underlying_type_t<T>&>(value), archive);
     } catch (const std::exception& e) {
