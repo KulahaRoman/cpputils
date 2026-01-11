@@ -25,8 +25,9 @@ void BinaryArchive::Read(unsigned char* const data, std::size_t size) {
     std::copy(beginPosition, endPosition, data);
 
     gpos += size;
-  } catch (...) {
-    throw std::runtime_error("failed to read data from internal storage");
+  } catch (const std::exception& e) {
+    throw std::runtime_error("failed to read data from internal storage: " +
+                             std::string{e.what()});
   }
 }
 
@@ -44,8 +45,9 @@ void BinaryArchive::Write(const unsigned char* const data, std::size_t size) {
     std::copy(data, data + size, this->data.data() + ppos);
 
     ppos += size;
-  } catch (...) {
-    throw std::runtime_error("failed to write data to internal storage");
+  } catch (const std::exception& e) {
+    throw std::runtime_error("failed to write data to internal storage: " +
+                             std::string{e.what()});
   }
 }
 
