@@ -33,27 +33,29 @@ class BinaryArchive {
   // location, pointed by 'data' argument. Affects reading position, increasing
   // it by 'size' argument value. Throws exception if 'size' argument value
   // exceeds internal storage bound, considering last reading position.
-  void Read(char* const data, std::size_t size);
+  void Read(unsigned char* const data, std::size_t size);
 
   // Copies 'size' amount of data from the memory location, pointed by 'data'
   // argument to internal storage. Affects writing position, increasing it by
   // 'size' argument value.
   // Expands internal storage size while inserting new data.
   // Throws exception if internal storage expanding failed.
-  void Write(const char* const data, std::size_t size);
+  void Write(const unsigned char* const data, std::size_t size);
 
   // Returns current reading position depending on seek direction.
-  int32_t GetReadPosition(SeekDirection seekDir = SeekDirection::BEGIN) const;
+  std::size_t GetReadPosition(
+      SeekDirection seekDir = SeekDirection::BEGIN) const;
 
   // Sets new value of reading position depending on seek direction.
-  void SetReadPosition(int32_t pos,
+  void SetReadPosition(std::size_t pos,
                        SeekDirection seekDir = SeekDirection::BEGIN);
 
   // Returns current writing position depending on seek direction.
-  int32_t GetWritePosition(SeekDirection seekDir = SeekDirection::BEGIN) const;
+  std::size_t GetWritePosition(
+      SeekDirection seekDir = SeekDirection::BEGIN) const;
 
   // Sets new value of writing position depending on seek direction.
-  void SetWritePosition(int32_t pos,
+  void SetWritePosition(std::size_t pos,
                         SeekDirection seekDir = SeekDirection::BEGIN);
 
   // Sets size of internal storage to 0.
@@ -65,24 +67,24 @@ class BinaryArchive {
   std::size_t GetSize() const;
 
   // Returns data pointer to first element of internal storage.
-  const char* GetDataPointer() const;
+  const unsigned char* GetDataPointer() const;
 
  private:
   enum class SeekType { READ, WRITE };
 
-  int32_t calculateNewPosition(int32_t pos, SeekType seekType,
-                               SeekDirection seekDir) const;
-  int32_t calculateCurrentPosition(SeekType seekType,
+  std::size_t calculateNewPosition(std::size_t pos, SeekType seekType,
                                    SeekDirection seekDir) const;
+  std::size_t calculateCurrentPosition(SeekType seekType,
+                                       SeekDirection seekDir) const;
 
  private:
   static const std::size_t INITIAL_CAPACITY;
-  static const int32_t UNDEFINED_POSITION;
+  static const std::size_t UNDEFINED_POSITION;
 
-  std::vector<char> data;
+  std::vector<unsigned char> data;
 
-  int32_t ppos;
-  int32_t gpos;
+  std::size_t ppos;
+  std::size_t gpos;
 };
 }  // namespace Serialization
 }  // namespace CppUtils

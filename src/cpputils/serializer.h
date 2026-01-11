@@ -41,7 +41,8 @@ class Serializer {
         temp = value;
       }
 
-      archive.Write(reinterpret_cast<const char*>(&temp), sizeof(temp));
+      archive.Write(reinterpret_cast<const unsigned char*>(&temp),
+                    sizeof(temp));
     } catch (const std::exception& e) {
       throw std::runtime_error("failed to serialize integral type value: " +
                                std::string{e.what()});
@@ -66,7 +67,8 @@ class Serializer {
 
       Serialize(strSizeInBytes, archive);
 
-      archive.Write(str.data(), static_cast<std::size_t>(strSizeInBytes));
+      archive.Write(reinterpret_cast<const unsigned char*>(str.data()),
+                    static_cast<std::size_t>(strSizeInBytes));
     } catch (const std::exception& e) {
       throw std::runtime_error("failed to serialize std::string: " +
                                std::string{e.what()});
@@ -80,7 +82,7 @@ class Serializer {
 
       Serialize(strSizeInBytes, archive);
 
-      archive.Write(reinterpret_cast<const char*>(wstr.data()),
+      archive.Write(reinterpret_cast<const unsigned char*>(wstr.data()),
                     static_cast<std::size_t>(strSizeInBytes));
     } catch (const std::exception& e) {
       throw std::runtime_error("failed to serialize std::wstring: " +
@@ -431,7 +433,7 @@ class Serializer {
     try {
       T temp{};
 
-      archive.Read(reinterpret_cast<char*>(&temp), sizeof(temp));
+      archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
 
       // let's assume that network endian is big
       if (EndiannessProvider::GetSystemEndianness() ==
@@ -466,7 +468,8 @@ class Serializer {
 
       str.resize(static_cast<std::size_t>(strSizeInBytes));
 
-      archive.Read(str.data(), static_cast<std::size_t>(strSizeInBytes));
+      archive.Read(reinterpret_cast<unsigned char*>(str.data()),
+                   static_cast<std::size_t>(strSizeInBytes));
     } catch (const std::exception& e) {
       throw std::runtime_error("failed to deserialize std::string: " +
                                std::string{e.what()});
@@ -481,7 +484,7 @@ class Serializer {
 
       wstr.resize(static_cast<std::size_t>(strSizeInBytes / sizeof(wchar_t)));
 
-      archive.Read(reinterpret_cast<char*>(wstr.data()),
+      archive.Read(reinterpret_cast<unsigned char*>(wstr.data()),
                    static_cast<std::size_t>(strSizeInBytes));
     } catch (const std::exception& e) {
       throw std::runtime_error("failed to deserialize std::wstring: " +
@@ -925,8 +928,8 @@ class Serializer {
   static T swapBytes(T value) noexcept {
     T temp{value};
 
-    char* start = reinterpret_cast<char*>(&temp);
-    char* end = start + sizeof(temp);
+    unsigned char* start = reinterpret_cast<unsigned char*>(&temp);
+    unsigned char* end = start + sizeof(temp);
 
     std::reverse(start, end);
 
