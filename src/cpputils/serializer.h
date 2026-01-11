@@ -42,8 +42,9 @@ class Serializer {
       }
 
       archive.Write(reinterpret_cast<const char*>(&temp), sizeof(temp));
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize integral type value.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize integral type value: " +
+                               std::string{e.what()});
     }
   }
 
@@ -53,8 +54,9 @@ class Serializer {
       std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
     try {
       Serialize(static_cast<std::underlying_type_t<T>>(value), archive);
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize enum type value.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize enum type value: " +
+                               std::string{e.what()});
     }
   }
 
@@ -65,8 +67,9 @@ class Serializer {
       Serialize(strSizeInBytes, archive);
 
       archive.Write(str.data(), static_cast<std::size_t>(strSizeInBytes));
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::string.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::string: " +
+                               std::string{e.what()});
     }
   }
 
@@ -79,8 +82,9 @@ class Serializer {
 
       archive.Write(reinterpret_cast<const char*>(wstr.data()),
                     static_cast<std::size_t>(strSizeInBytes));
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::wstring.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::wstring: " +
+                               std::string{e.what()});
     }
   }
 
@@ -89,8 +93,9 @@ class Serializer {
     try {
       Serialize(pair.first, archive);
       Serialize(pair.second, archive);
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::pair<T1,T2>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::pair<T1,T2>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -100,8 +105,9 @@ class Serializer {
       for (const auto& value : array) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::array<T,N>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::array<T,N>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -115,8 +121,9 @@ class Serializer {
         Serialize(key, archive);
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::map<K,V>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::map<K,V>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -130,8 +137,9 @@ class Serializer {
         Serialize(key, archive);
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::multimap<K,V>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::multimap<K,V>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -146,8 +154,9 @@ class Serializer {
         Serialize(key, archive);
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::unordered_map<K,V>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::unordered_map<K,V>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -162,9 +171,10 @@ class Serializer {
         Serialize(key, archive);
         Serialize(value, archive);
       }
-    } catch (...) {
+    } catch (const std::exception& e) {
       throw std::runtime_error(
-          "Failed to serialize std::unordered_multimap<K,V>.");
+          "failed to serialize std::unordered_multimap<K,V>: " +
+          std::string{e.what()});
     }
   }
 
@@ -177,8 +187,9 @@ class Serializer {
       for (const auto& value : set) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::set<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::set<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -191,8 +202,9 @@ class Serializer {
       for (const auto& value : multiset) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::multiset<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::multiset<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -206,8 +218,9 @@ class Serializer {
       for (const auto& value : uset) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::unordered_set<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::unordered_set<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -221,9 +234,10 @@ class Serializer {
       for (const auto& value : umultiset) {
         Serialize(value, archive);
       }
-    } catch (...) {
+    } catch (const std::exception& e) {
       throw std::runtime_error(
-          "Failed to serialize std::unordered_multiset<T>.");
+          "failed to serialize std::unordered_multiset<T>: " +
+          std::string{e.what()});
     }
   }
 
@@ -239,8 +253,9 @@ class Serializer {
         Serialize(stackCopy.top(), archive);
         stackCopy.pop();
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::stack<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::stack<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -256,8 +271,9 @@ class Serializer {
         Serialize(queueCopy.front(), archive);
         queueCopy.pop();
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::queue<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::queue<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -274,8 +290,9 @@ class Serializer {
         Serialize(pqueueCopy.top(), archive);
         pqueueCopy.pop();
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::priority_queue<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::priority_queue<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -288,8 +305,9 @@ class Serializer {
       for (const auto& value : deque) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::deque<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::deque<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -302,8 +320,9 @@ class Serializer {
       for (const auto& value : list) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::list<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::list<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -327,8 +346,9 @@ class Serializer {
       Serialize(size, archive);
 
       archive.SetWritePosition(currentArchivePosition);
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::forward_list<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::forward_list<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -341,8 +361,9 @@ class Serializer {
       for (const auto& value : vector) {
         Serialize(value, archive);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to serialize std::vector<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to serialize std::vector<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -419,8 +440,9 @@ class Serializer {
       } else {
         value = temp;
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize integral type value.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize integral type value: " +
+                               std::string{e.what()});
     }
   }
 
@@ -430,8 +452,9 @@ class Serializer {
       std::enable_if_t<std::is_enum<T>::value, T>* = nullptr) {
     try {
       Deserialize(reinterpret_cast<std::underlying_type_t<T>&>(value), archive);
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize enum type value.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize enum type value: " +
+                               std::string{e.what()});
     }
   }
 
@@ -444,8 +467,9 @@ class Serializer {
       str.resize(static_cast<std::size_t>(strSizeInBytes));
 
       archive.Read(str.data(), static_cast<std::size_t>(strSizeInBytes));
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::string.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::string: " +
+                               std::string{e.what()});
     }
   }
 
@@ -459,8 +483,9 @@ class Serializer {
 
       archive.Read(reinterpret_cast<char*>(wstr.data()),
                    static_cast<std::size_t>(strSizeInBytes));
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::wstring.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::wstring: " +
+                               std::string{e.what()});
     }
   }
 
@@ -475,8 +500,9 @@ class Serializer {
 
       pair.first = first;
       pair.second = second;
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::pair<T1,T2>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::pair<T1,T2>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -488,8 +514,9 @@ class Serializer {
         Deserialize(value, archive);
         array[i] = std::move(value);
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::array<T,N>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::array<T,N>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -510,8 +537,9 @@ class Serializer {
 
         map.emplace(std::move(key), std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::map<K,V>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::map<K,V>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -532,8 +560,9 @@ class Serializer {
 
         multimap.emplace(std::move(key), std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::multimap<K,V>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::multimap<K,V>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -555,9 +584,10 @@ class Serializer {
 
         umap.emplace(std::move(key), std::move(value));
       }
-    } catch (...) {
+    } catch (const std::exception& e) {
       throw std::runtime_error(
-          "Failed to deserialize std::unordered_map<K,V>.");
+          "failed to deserialize std::unordered_map<K,V>: " +
+          std::string{e.what()});
     }
   }
 
@@ -579,9 +609,10 @@ class Serializer {
 
         umultimap.emplace(std::move(key), std::move(value));
       }
-    } catch (...) {
+    } catch (const std::exception& e) {
       throw std::runtime_error(
-          "Failed to deserialize std::unordered_multimap<K,V>.");
+          "failed to deserialize std::unordered_multimap<K,V>: " +
+          std::string{e.what()});
     }
   }
 
@@ -600,8 +631,9 @@ class Serializer {
 
         set.emplace(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::set<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::set<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -620,8 +652,9 @@ class Serializer {
 
         multiset.emplace(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::multiset<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::multiset<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -641,8 +674,9 @@ class Serializer {
 
         uset.emplace(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::unordered_set<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::unordered_set<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -662,9 +696,10 @@ class Serializer {
 
         umultiset.emplace(std::move(value));
       }
-    } catch (...) {
+    } catch (const std::exception& e) {
       throw std::runtime_error(
-          "Failed to deserialize std::unordered_multiset<T>.");
+          "failed to deserialize std::unordered_multiset<T>: " +
+          std::string{e.what()});
     }
   }
 
@@ -690,8 +725,9 @@ class Serializer {
         stack.emplace(helper.top());
         helper.pop();
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::stack<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::stack<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -710,8 +746,9 @@ class Serializer {
 
         queue.emplace(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::queue<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::queue<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -730,8 +767,10 @@ class Serializer {
 
         pqueue.emplace(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::priority_queue<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error(
+          "failed to deserialize std::priority_queue<T>: " +
+          std::string{e.what()});
     }
   }
 
@@ -750,8 +789,9 @@ class Serializer {
 
         deque.emplace_back(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::deque<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::deque<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -770,8 +810,9 @@ class Serializer {
 
         list.emplace_back(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::list<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::list<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -793,8 +834,9 @@ class Serializer {
 
       flist.reverse();
 
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::forward_list<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::forward_list<T>: " +
+                               std::string{e.what()});
     }
   }
 
@@ -813,8 +855,9 @@ class Serializer {
 
         vector.emplace_back(std::move(value));
       }
-    } catch (...) {
-      throw std::runtime_error("Failed to deserialize std::vector<T>.");
+    } catch (const std::exception& e) {
+      throw std::runtime_error("failed to deserialize std::vector<T>: " +
+                               std::string{e.what()});
     }
   }
 
