@@ -21,17 +21,9 @@
 
 namespace CppUtils {
 namespace Serialization {
-// Represents a singletone class that does mostly all job of serialization.
-// Currently supports integral types, enum types, STL strings, several
-// containers and custom Serializable class. Detects and prevents cyclic
-// references. Checks system endianness in runtime so it's fine
-// to use this serializer to exchange some data between Linux and Windows apps.
-
-#define CYCLIC_WEAK_REFERENCE(field) \
-  if (field.lock()->field.lock()) {  \
-    cacheSharedObject(field);        \
-  }
-
+// Singletone class that does actual serialization.
+// Supports integral types, enums, strings, containers and
+// custom Serializable class.
 class Serializer {
  public:
   template <class T>
@@ -40,7 +32,7 @@ class Serializer {
       std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
       // let's assume that network endian is big
-      T temp = 0;
+      T temp{};
 
       if (EndiannessProvider::GetSystemEndianness() ==
           EndiannessProvider::Endianness::LITTLE) {
@@ -418,7 +410,7 @@ class Serializer {
       T& value, BinaryArchive& archive,
       std::enable_if_t<std::is_integral<T>::value, T>* = nullptr) {
     try {
-      T temp = 0;
+      T temp{};
 
       archive.Read(reinterpret_cast<unsigned char*>(&temp), sizeof(temp));
 
@@ -893,9 +885,10 @@ class Serializer {
   static T swapBytes(T value) noexcept {
     T temp = value;
 
-    char *istart = reinterpret_cast<char*>(&temp),
-         *iend = istart + sizeof(temp);
-    std::reverse(istart, iend);
+    char* start = reinterpret_cast<char*>(&temp);
+    char* end = start + sizeof(temp);
+
+    std::reverse(start, end);
 
     return temp;
   }
