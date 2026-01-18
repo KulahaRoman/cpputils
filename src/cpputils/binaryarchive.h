@@ -66,8 +66,11 @@ class BinaryArchive {
   // Returns size of internal storage.
   std::size_t GetSize() const;
 
-  // Returns data pointer to first element of internal storage.
+  // Returns constant data pointer to first element of internal storage.
   const unsigned char* GetDataPointer() const;
+
+  // Returns data pointer to first element of internal storage.
+  unsigned char* GetDataPointer();
 
  private:
   enum class SeekType { READ, WRITE };

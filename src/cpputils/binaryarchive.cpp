@@ -111,6 +111,8 @@ const unsigned char* BinaryArchive::GetDataPointer() const {
   return data.data();
 }
 
+unsigned char* BinaryArchive::GetDataPointer() { return data.data(); }
+
 std::size_t BinaryArchive::calculateNewPosition(std::size_t pos,
                                                 SeekType seekType,
                                                 SeekDirection seekDir) const {
