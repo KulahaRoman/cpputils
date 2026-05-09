@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.15)
 project(cpputils-test)
 
 set(CPPUTILS_TEST_SRC	main.cpp
-						src/binaryarchivetest.cpp
-						src/serializertest.cpp
+						
+						
 						src/hashertest.cpp
 						src/encryptortest.cpp
 						src/loggertest.cpp

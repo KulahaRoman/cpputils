@@ -12,10 +12,10 @@ set(CPPUTILS_SRC
 			${PROJECT_NAME}/md5.cpp
 			${PROJECT_NAME}/sha256hasher.cpp
 			${PROJECT_NAME}/sha256.cpp
-			${PROJECT_NAME}/binaryarchive.cpp
-			${PROJECT_NAME}/serializer.cpp
+			
+			
 			${PROJECT_NAME}/countdownlatch.cpp
-			${PROJECT_NAME}/endiannessprovider.cpp
+			
 			${PROJECT_NAME}/threadpoolexecutor.cpp
 			${PROJECT_NAME}/threadpertaskexecutor.cpp
 )
@@ -30,9 +30,6 @@ set(CPPUTILS_HEADERS
 			${PROJECT_NAME}/hasher.h
 			${PROJECT_NAME}/md5hasher.h
 			${PROJECT_NAME}/sha256hasher.h
-			${PROJECT_NAME}/binaryarchive.h
-			${PROJECT_NAME}/serializable.h
-			${PROJECT_NAME}/serializer.h
 			${PROJECT_NAME}/executor.h
 			${PROJECT_NAME}/threadpoolexecutor.h
 			${PROJECT_NAME}/threadpertaskexecutor.h
