@@ -4,7 +4,6 @@ project(cpputils-test)
 
 set(CPPUTILS_TEST_SRC	main.cpp
 						
-						
 						src/hashertest.cpp
 						src/encryptortest.cpp
 						src/loggertest.cpp
@@ -15,8 +14,6 @@ add_executable(${PROJECT_NAME} ${CPPUTILS_TEST_SRC})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC cpputils)
 target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest)
-
-config_compiler_and_linker()
 
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE "/EHsc")
